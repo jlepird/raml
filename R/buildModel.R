@@ -6,17 +6,17 @@
 #'
 Model <- setRefClass("RAMLClass",
                      fields = c("sense",
-                                "objective",
+                                "obj",
                                 "constraints",
                                 "variables"),
                      methods = list(
                        initialize = function(...){
 
                          # Provide default values
-                         sense <<- "min"
-                         objective <<- NA
-                         constraints <<- NA
-                         variables <<- NA
+                         sense       <<- "min"
+                         obj         <<- NULL
+                         constraints <<- NULL
+                         variables   <<- NULL
 
                          # Call super to override any defaults
                          callSuper(...)
@@ -41,7 +41,6 @@ Model <- setRefClass("RAMLClass",
                           defn <- defn[2][[1]]
                          }
 
-                         print(length(defn))
                          if (length(defn) > 1){
                            if (as.character(defn[[1]]) == "[") { # then it's an array
                              stop("Not yet implemented")
@@ -50,8 +49,11 @@ Model <- setRefClass("RAMLClass",
                            }
                          } else {
                              name <- as.character(defn)
-                             return(.defVar(name, bounds, integer))
-                           }
+                             txt <- paste0(name, " <- .defVar(\"", name, "\", c(", bounds[1], ",", bounds[2], ")", ",\"", integer, "\")")
+                             variables <<- c(variables, name)
+                             eval.parent(parse(text = txt))
+                         }
+                         invisible()
                        },
                        constraint = function(){},
                        objective = function(){}
@@ -64,5 +66,35 @@ Model <- setRefClass("RAMLClass",
               integer = integer,
               value = NA)
   class(out) <- c("list", "ramlVariable")
+  return(out)
 }
 
+show.ramlVariable <- function(v){
+  lbBracket <- "["
+  if (v$bounds[1] == -Inf) {
+    lbBracket <- "("
+  }
+  ubBracket <- "]"
+  if (v$bounds[2] == Inf) {
+    ubBracket <- ")"
+  }
+  if (v$integer == "Real") {
+    field <- "\U211D"
+  } else if (v$integer == "Integer") {
+    field <- "\U2124"
+  }
+
+  if (sum(v$bounds == c(-Inf, Inf)) == 2) {
+    boundStatement <- ""
+  } else {
+    boundStatement <- paste0("\U2229 ",lbBracket, v$bounds[1],", ", v$bounds[2], ubBracket)
+  }
+
+  print(paste(v$name, "\U2208", field, boundStatement))
+
+
+
+  # print(paste0(v$integer, " variable in [", v$bounds[1], ", ", v$bounds[2], "]"))
+}
+
+print.ramlVariable <- show.ramlVariable

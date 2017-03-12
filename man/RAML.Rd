@@ -11,7 +11,7 @@ An object containing all data necessary for preference elicitation.
 \section{Fields}{
 
 \describe{
-\item{\code{data}}{A matrix or dataframe of data.}
+\item{\code{sense}}{Should the objective be minimized ("min") or maximized ("max")?}
 }}
 
 
