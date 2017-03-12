@@ -1,10 +1,8 @@
 #' An object containing all data necessary for preference elicitation.
-#' @name RAML
+#' @name RAMLModel
 #' @import methods
 #' @field sense Should the objective be minimized ("min") or maximized ("max")?
-#'
-#'
-Model <- setRefClass("RAMLClass",
+.Model <- setRefClass("RAMLModel",
                      fields = c("sense",
                                 "obj",
                                 "constraints",
@@ -26,22 +24,24 @@ Model <- setRefClass("RAMLClass",
                          defn <- match.call()$defn
                          bounds <- c(-Inf, Inf)
 
-                         # First, figure out if the user defined var bounds.
-                         equality <- as.character(defn[1])
+                         if (length(defn) > 1) {
+                           # First, figure out if the user defined var bounds.
+                           equality <- as.character(defn[1])
 
-                         if (equality %in% c(">=", "<=")){
-                           if (as.character(defn[1]) == ">=") {
-                             # Get right hand side
-                             lb <- eval(parse(text = defn[3]))
-                             bounds <- c(lb, Inf)
-                           } else if (as.character(defn[1]) == "<=") {
-                             ub <- eval(parse(text = defn[3]))
-                             bounds <- c(-Inf, ub)
+                           if (equality %in% c(">=", "<=")) {
+                             if (as.character(defn[1]) == ">=") {
+                               # Get right hand side
+                               lb <- eval(parse(text = defn[3]))
+                               bounds <- c(lb, Inf)
+                             } else if (as.character(defn[1]) == "<=") {
+                               ub <- eval(parse(text = defn[3]))
+                               bounds <- c(-Inf, ub)
+                             }
+                            defn <- defn[2][[1]]
                            }
-                          defn <- defn[2][[1]]
                          }
 
-                         if (length(defn) > 1){
+                         if (length(defn) > 1) {
                            if (as.character(defn[[1]]) == "[") { # then it's an array
                              stop("Not yet implemented")
                            } else {
@@ -49,7 +49,7 @@ Model <- setRefClass("RAMLClass",
                            }
                          } else {
                              name <- as.character(defn)
-                             txt <- paste0(name, " <- .defVar(\"", name, "\", c(", bounds[1], ",", bounds[2], ")", ",\"", integer, "\")")
+                             txt <- paste0(name, " <- raml:::.defVar(\"", name, "\", c(", bounds[1], ",", bounds[2], ")", ",\"", integer, "\")")
                              variables <<- c(variables, name)
                              eval.parent(parse(text = txt))
                          }
@@ -60,6 +60,11 @@ Model <- setRefClass("RAMLClass",
                       )
 )
 
+#' Factory for creating Models.
+#' @export
+#' @param ... Arguments to be passed to the
+Model <- function(...) .Model(...)
+
 .defVar <- function(name, bounds, integer){
   out <- list(name = name,
               bounds = bounds,
@@ -69,32 +74,36 @@ Model <- setRefClass("RAMLClass",
   return(out)
 }
 
-show.ramlVariable <- function(v){
+#' Nice display for single variables.
+#' @export
+#' @param x The variable to be printed, of the "ramlVariable" class.
+#' @param ... Other arguments to pass on to print.
+print.ramlVariable <- function(x, ...){
   lbBracket <- "["
-  if (v$bounds[1] == -Inf) {
+  if (x$bounds[1] == -Inf) {
     lbBracket <- "("
   }
   ubBracket <- "]"
-  if (v$bounds[2] == Inf) {
+  if (x$bounds[2] == Inf) {
     ubBracket <- ")"
   }
-  if (v$integer == "Real") {
+  if (x$integer == "Real") {
     field <- "\U211D"
-  } else if (v$integer == "Integer") {
+  } else if (x$integer == "Integer") {
     field <- "\U2124"
   }
 
-  if (sum(v$bounds == c(-Inf, Inf)) == 2) {
+  if (sum(x$bounds == c(-Inf, Inf)) == 2) {
     boundStatement <- ""
   } else {
-    boundStatement <- paste0("\U2229 ",lbBracket, v$bounds[1],", ", v$bounds[2], ubBracket)
+    boundStatement <- paste0(" \U2229 ",lbBracket, x$bounds[1],", ", x$bounds[2], ubBracket)
   }
 
-  print(paste(v$name, "\U2208", field, boundStatement))
-
-
-
-  # print(paste0(v$integer, " variable in [", v$bounds[1], ", ", v$bounds[2], "]"))
+  print(paste0(x$name, " \U2208 ", field, boundStatement), ...)
 }
 
-print.ramlVariable <- show.ramlVariable
+# Nice display for single variables.
+# @export
+# @param x The variable to be printed, of the "ramlVariable" class.
+# @param ... Other arguments to pass on to print.
+#print.ramlVariable <- function(x, ...) show.ramlVariable(x, ...)
