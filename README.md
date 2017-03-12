@@ -1,5 +1,6 @@
 # raml
 [![Travis-CI Build Status](https://travis-ci.org/jlepird/raml.svg?branch=master)](https://travis-ci.org/jlepird/raml)
+[![Code Coverage](https://codecov.io/gh/jlepird/raml/branch/master/graph/badge.svg)](https://codecov.io/gh/jlepird/raml)
 
 The goal of raml is to ...
 
