@@ -1,1 +1,1 @@
-source("R/buildModel.R")
+source("R/interface.R")
