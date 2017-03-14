@@ -4,9 +4,9 @@
 \name{RAMLModel}
 \alias{RAMLModel}
 \alias{.Model}
-\title{An object containing all data necessary for preference elicitation.}
+\title{A class that holds all the necessary data to build a linear programming model.}
 \description{
-An object containing all data necessary for preference elicitation.
+A class that holds all the necessary data to build a linear programming model.
 }
 \section{Fields}{
 
