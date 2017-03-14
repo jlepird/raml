@@ -60,6 +60,7 @@ expect_s4_class(x1, "AffineExpr")
 expect_equal(x1@vars, "x")
 expect_equal(x1@coefs, 1)
 expect_equal(x1@offset, 1)
+expect_equal(x1, 1 + x)
 
 xx <- x + x
 expect_s4_class(xx, "AffineExpr")
@@ -99,3 +100,9 @@ expect_equal(xx1@coefs, 2)
 expect_equal(xx1@offset, 1)
 
 expect_equal(x + x + 1, 1 + (x + x))
+
+xyxy <- (x + y) + (x + y)
+expect_s4_class(xyxy, "AffineExpr")
+expect_equal(xyxy@vars, c("x", "y"))
+expect_equal(xyxy@coefs, c(2, 2))
+expect_equal(xyxy@offset, 0)
