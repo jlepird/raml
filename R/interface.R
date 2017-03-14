@@ -245,8 +245,8 @@ setMethod("+", signature(e1 = "ramlVariable", e2 = "AffineExpr"), function(e1, e
           e2@coefs[which(e2@vars == e1@name)] <-
             e2@coefs[which(e2@vars == e1@name)] + 1
         } else {
-          e2@coefs <- c(e2$coefs, 1)
-          e2@vars <-  c(e2$vars,  e1@name)
+          e2@coefs <- c(e2@coefs, 1)
+          e2@vars <-  c(e2@vars,  e1@name)
         }
   return(e2)
 })

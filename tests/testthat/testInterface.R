@@ -55,6 +55,12 @@ m$var(int, integer = "Integer")
 expect_equal(int@integer, "Integer")
 expect_equal(capture.output(int), "int ∈ ℤ")
 
+x1 <- x + 1
+expect_s4_class(x1, "AffineExpr")
+expect_equal(x1@vars, "x")
+expect_equal(x1@coefs, 1)
+expect_equal(x1@offset, 1)
+
 xx <- x + x
 expect_s4_class(xx, "AffineExpr")
 expect_equal(xx@vars, "x")
@@ -69,6 +75,19 @@ expect_equal(xxx@offset, 0)
 
 expect_equal((x + x) + x, x + (x + x))
 xxxx <- (x + x) + (x + x)
+expect_s4_class(xxxx, "AffineExpr")
 expect_equal(xxxx@vars, "x")
 expect_equal(xxxx@coefs, 4)
 expect_equal(xxxx@offset, 0)
+
+xy <- x + y
+expect_s4_class(xy, "AffineExpr")
+expect_equal(xy@vars, c("x", "y"))
+expect_equal(xy@coefs, c(1, 1))
+expect_equal(xy@offset, 0)
+
+xxy <- x + x + y
+expect_s4_class(xxy, "AffineExpr")
+expect_equal(xxy@vars, c("x", "y"))
+expect_equal(xxy@coefs, c(2, 1))
+expect_equal(xxy@offset, 0)
