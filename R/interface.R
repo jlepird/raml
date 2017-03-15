@@ -206,10 +206,10 @@ setClass("AffineExpr",
          contains = "AbstractRamlAlgObject"
          )
 
-#' Nice display for affine expressions..
+#' Nice display for affine expressions.
 #' @export
 #' @param object The expression to be printed, of the "AffineExpr" class.
-setMethod("show", "AffineExpr", function(object){
+setMethod("show", "AffineExpr", function(object) {
   out <- ""
   if (object@offset != 0) {
     out <- paste(object@offset)
