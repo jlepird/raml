@@ -206,6 +206,27 @@ setClass("AffineExpr",
          contains = "AbstractRamlAlgObject"
          )
 
+#' Nice display for affine expressions..
+#' @export
+#' @param object The expression to be printed, of the "AffineExpr" class.
+setMethod("show", "AffineExpr", function(object){
+  out <- ""
+  if (object@offset != 0) {
+    out <- paste(object@offset)
+  }
+  for (i in 1:length(object@coefs)) {
+    if (object@coefs[i] != 0) {
+      if (nchar(out) == 0) {
+        out <- paste0(object@coefs[i], "*", object@vars[i])
+      } else {
+        out <- paste0(out, " + ", object@coefs[i], "*", object@vars[i])
+      }
+    }
+  }
+  cat(paste0(out, "\n"))
+}
+)
+
 #' Algebra within the raml ecosystem.
 #' @export
 #' @rdname raml-algebra

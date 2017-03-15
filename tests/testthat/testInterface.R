@@ -115,9 +115,11 @@ expect_equal(xyxz@offset, 0)
 
 expect_equal(x - 1, -1 + x)
 expect_equal((x - x)@coefs, 0)
-
 expect_equal(1 - x, -1 * (x - 1))
-
 expect_equal(x + x + x, 3 * x)
-
 expect_equal(x / 2, x * 1/2)
+
+expect_equal(capture.output(x + x),     "2*x")
+expect_equal(capture.output(x + x + y), "2*x + 1*y")
+expect_equal(capture.output(x - x + y), "1*y")
+expect_equal(capture.output(1 + x + y), "1 + 1*x + 1*y")
