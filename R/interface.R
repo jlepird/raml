@@ -69,8 +69,13 @@
 #' @param ... Arguments to be passed to the
 Model <- function(...) .Model(...)
 
-#' A class that represents a variable
-#' @exportClass ramlVariable
+#' An abstract class that represents anything that conforms to algebraic rules.
+#' @exportClass AbstractRamlAlgObject
+setClass("AbstractRamlAlgObject",
+         contains = "VIRTUAL")
+
+#' An abstract class that represents arrays or variables that conform to algebraic rules.
+#' @exportClass ramlAlgObject
 #' @section Slots:
 #'  \describe{
 #'    \item{\code{name}:}{Objectx of class \code{"character"}-- the name of the variable in the user's scope.}
@@ -78,11 +83,16 @@ Model <- function(...) .Model(...)
 #'    \item{\code{integer}:}{Object of class \code{"character"}, which defines if the variable is a \code{"Real"}, \code{"Integer"}, or \code{"Binary"}}
 #'    \item{\code{value}:}{Object of class \code{"numeric"}, the value of the variable at the model's optimum.}
 #'  }
-setClass("ramlVariable",
+setClass("ramlAlgObject",
          representation(name    = "character",
                         bounds  = "numeric",
                         integer = "character",
-                        value   = "numeric"))
+                        value   = "numeric"),
+         contains = c("AbstractRamlAlgObject", "VIRTUAL"))
+
+#' A class that represents a single variable
+#' @exportClass ramlVariable
+setClass("ramlVariable", contains = "ramlAlgObject")
 
 .defVar <- function(name, bounds, integer){
   out <- new("ramlVariable",
@@ -97,20 +107,13 @@ setClass("ramlVariable",
 #' @exportClass ramlArray
 #' @section Slots:
 #'  \describe{
-#'    \item{\code{name}:}{Objectx of class \code{"character"}-- the name of the variable in the user's scope.}
-#'    \item{\code{bounds}:}{Object of class \code{"numeric"}, which defines the lower and upper bounds of the variable's domain.}
-#'    \item{\code{integer}:}{Object of class \code{"character"}, which defines if the variable is a \code{"Real"}, \code{"Integer"}, or \code{"Binary"}}
 #'    \item{\code{indicies}:}{Objectx of class \code{"character"}-- a vector of the suffixes appended to this variable for its elements.}
 #'    \item{\code{indexDisplay}:}{Objectx of class \code{"character"}-- human-readable display of these indicies.}
-#'    \item{\code{value}:}{Object of class \code{"numeric"}, the value of the variable at the model's optimum.}
 #'  }
 setClass("ramlArray",
-         representation(name         = "character",
-                        bounds       = "numeric",
-                        integer      = "character",
-                        indicies     = "character",
-                        indexDisplay = "character",
-                        value        = "numeric"))
+         representation(indicies     = "character",
+                        indexDisplay = "character"),
+         contains = "ramlAlgObject")
 
 #' Defines a variable in the current scope
 .defArray <- function(name, bounds, integer, indicies, indexDisplay){
@@ -197,16 +200,18 @@ setMethod("show", "ramlArray", function(object){
 #'    \item{\code{offset}:}{Object of class \code{"numeric"}, which indicates the scalar that offsets this affine expression from a linear expression.}
 #'  }
 setClass("AffineExpr",
-         representation(vars    = "character",
+         representation(vars   = "character",
                         coefs  = "numeric",
-                        offset = "numeric")
+                        offset = "numeric"),
+         contains = "AbstractRamlAlgObject"
          )
 
-#' Adds a scalar to a variable, resulting in an affine expression.
+#' Algebra within the raml ecosystem.
 #' @export
-#' @rdname var-scalar
-#' @param e1 The first variable to be added.
-#' @param e2 The second variable to be added.
+#' @rdname raml-algebra
+#' @param e1 The first algebraic object.
+#' @param e2 The second algebraic object.
+#' @usage foo
 setMethod("+", signature(e1 = "ramlVariable", e2 = "numeric"), function(e1, e2) {
   return(new("AffineExpr",
              vars = e1@name,
@@ -215,13 +220,11 @@ setMethod("+", signature(e1 = "ramlVariable", e2 = "numeric"), function(e1, e2) 
 })
 
 #' @export
-#' @rdname var-scalar
+#' @rdname raml-algebra
 setMethod("+", signature(e2 = "ramlVariable", e1 = "numeric"), function(e1, e2) e2 + e1)
 
-#' Adds two variables together to form an affine expression.
 #' @export
-#' @param e1 The first variable to be added.
-#' @param e2 The second variable to be added.
+#' @rdname raml-algebra
 setMethod("+", signature(e1 = "ramlVariable", e2 = "ramlVariable"), function(e1, e2){
       if (e1@name != e2@name) {
         out <- new("AffineExpr",
@@ -237,9 +240,7 @@ setMethod("+", signature(e1 = "ramlVariable", e2 = "ramlVariable"), function(e1,
 })
 
 #' @export
-#' @rdname var-affine
-#' @param e1 The AffineExpr to be added.
-#' @param e2 The variable to be added to the affine expression.
+#' @rdname raml-algebra
 setMethod("+", signature(e1 = "ramlVariable", e2 = "AffineExpr"), function(e1, e2) {
         if (e1@name %in% e2@vars) {
           e2@coefs[which(e2@vars == e1@name)] <-
@@ -251,32 +252,25 @@ setMethod("+", signature(e1 = "ramlVariable", e2 = "AffineExpr"), function(e1, e
   return(e2)
 })
 
-#' Adds a scalar to an affine expression.
 #' @export
-#' @rdname scalar-affine
-#' @param e1 The AffineExpr to be added.
-#' @param e2 The scalar to be added to the affine expression.
+#' @rdname raml-algebra
 setMethod("+", signature(e2 = "numeric", e1 = "AffineExpr"), function(e1, e2){
   e1@offset <- e1@offset + e2
   return(e1)
 })
 
-#' Adds a scalar to an affine expression.
 #' @export
-#' @rdname scalar-affine
+#' @rdname raml-algebra
 setMethod("+", signature(e1 = "numeric", e2 = "AffineExpr"), function(e1, e2){
   return(e2 + e1)
 })
 
-#' Adds a variable to an affine expression.
 #' @export
-#' @rdname var-affine
+#' @rdname raml-algebra
 setMethod("+", signature(e2 = "ramlVariable", e1 = "AffineExpr"), function(e1, e2) e2 + e1)
 
-#' Adds two affine expressions together using basic algebra.
 #' @export
-#' @param e1 The first AffineExpr to be added.
-#' @param e2 The second AffineExpr
+#' @rdname raml-algebra
 setMethod("+", signature(e1 = "AffineExpr", e2 = "AffineExpr"), function(e1, e2){
       for (i in 1:length(e2@vars)) {
           if (e2@vars[i] %in% e1@vars) {
@@ -289,4 +283,44 @@ setMethod("+", signature(e1 = "AffineExpr", e2 = "AffineExpr"), function(e1, e2)
         }
         e1@offset <- e1@offset + e2@offset
         return(e1)
+})
+
+#' @export
+#' @rdname raml-algebra
+setMethod("*", signature(e1 = "ramlVariable", e2 = "numeric"), function(e1, e2) {
+  return(new("AffineExpr",
+             vars = e1@name,
+             offset = 0,
+             coefs = e2))
+})
+
+#' @export
+#' @rdname raml-algebra
+setMethod("*", signature(e2 = "numeric", e1 = "AffineExpr"), function(e1, e2){
+  e1@coefs <- e1@coefs * e2
+  return(e1)
+})
+
+#' @export
+#' @rdname raml-algebra
+setMethod("*", signature(e1 = "numeric", e2 = "AbstractRamlAlgObject"), function(e1, e2){
+  return(e2 * e1)
+})
+
+#' @export
+#' @rdname raml-algebra
+setMethod("-", signature(e1 = "AbstractRamlAlgObject", e2 = "numeric"), function(e1, e2) e1 + (-1 * e2))
+
+#' @export
+#' @rdname raml-algebra
+setMethod("-", signature(e2 = "AbstractRamlAlgObject", e1 = "numeric"), function(e1, e2) e1 + (-1 * e2))
+
+#' @export
+#' @rdname raml-algebra
+setMethod("-", signature(e1 = "AbstractRamlAlgObject", e2 = "AbstractRamlAlgObject"), function(e1, e2) e1 + (-1 * e2))
+
+#' @export
+#' @rdname raml-algebra
+setMethod("/", signature(e2 = "numeric", e1 = "AbstractRamlAlgObject"), function(e1, e2) {
+  return(e1 * (1/e2))
 })

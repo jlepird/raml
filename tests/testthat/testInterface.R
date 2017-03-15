@@ -112,3 +112,10 @@ expect_s4_class(xyxz, "AffineExpr")
 expect_equal(xyxz@vars, c("x", "y", "z"))
 expect_equal(xyxz@coefs, c(2, 1, 1))
 expect_equal(xyxz@offset, 0)
+
+expect_equal(x - 1, -1 + x)
+expect_equal((x - x)@coefs, 0)
+
+expect_equal(x + x + x, 3 * x)
+
+expect_equal(x / 2, x * 1/2)

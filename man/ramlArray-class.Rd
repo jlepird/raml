@@ -10,12 +10,8 @@ A class that represents a variable
 \section{Slots}{
 
  \describe{
-   \item{\code{name}:}{Objectx of class \code{"character"}-- the name of the variable in the user's scope.}
-   \item{\code{bounds}:}{Object of class \code{"numeric"}, which defines the lower and upper bounds of the variable's domain.}
-   \item{\code{integer}:}{Object of class \code{"character"}, which defines if the variable is a \code{"Real"}, \code{"Integer"}, or \code{"Binary"}}
    \item{\code{indicies}:}{Objectx of class \code{"character"}-- a vector of the suffixes appended to this variable for its elements.}
    \item{\code{indexDisplay}:}{Objectx of class \code{"character"}-- human-readable display of these indicies.}
-   \item{\code{value}:}{Object of class \code{"numeric"}, the value of the variable at the model's optimum.}
  }
 }
 
