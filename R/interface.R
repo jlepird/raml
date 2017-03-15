@@ -298,6 +298,7 @@ setMethod("*", signature(e1 = "ramlVariable", e2 = "numeric"), function(e1, e2) 
 #' @rdname raml-algebra
 setMethod("*", signature(e2 = "numeric", e1 = "AffineExpr"), function(e1, e2){
   e1@coefs <- e1@coefs * e2
+  e1@offset <- e1@offset * e2
   return(e1)
 })
 
