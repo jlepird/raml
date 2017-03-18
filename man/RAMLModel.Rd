@@ -12,6 +12,12 @@ A class that holds all the necessary data to build a linear programming model.
 
 \describe{
 \item{\code{sense}}{Should the objective be minimized ("min") or maximized ("max")?}
+
+\item{\code{.__obj}}{(Internal use only) The objective function of the model.}
+
+\item{\code{.__constraints}}{(Internal use only) A list of constraints of the model.}
+
+\item{\code{.__variables}}{(Internal use only) An array of the variables declared in the model.}
 }}
 
 

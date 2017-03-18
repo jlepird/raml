@@ -2,24 +2,45 @@
 #' @name RAMLModel
 #' @import methods
 #' @field sense Should the objective be minimized ("min") or maximized ("max")?
+#' @field .__obj (Internal use only) The objective function of the model.
+#' @field .__constraints (Internal use only) A list of constraints of the model.
+#' @field .__variables (Internal use only) An array of the variables declared in the model.
 .Model <- setRefClass("RAMLModel",
                      fields = c("sense",
-                                "obj",
-                                "constraints",
-                                "variables"),
+                                ".__obj",
+                                ".__constraints",
+                                ".__variables"),
                      methods = list(
                        initialize = function(...){
 
                          # Provide default values
-                         sense       <<- "min"
-                         obj         <<- NULL
-                         constraints <<- NULL
-                         variables   <<- NULL
+                         sense         <<- "min"
+                         .__obj         <<- NULL
+                         .__constraints <<- list()
+                         .__variables   <<- NULL
 
                          # Call super to override any defaults
                          callSuper(...)
                        },
-                       show = function(){},
+                       show = function() {
+                         if (sense == "min"){
+                           cat("Minimize: ")
+                         } else if (sense == "max"){
+                           cat("Maximize: ")
+                         }
+                         if (is.null(.__obj)) {
+                           cat("(Undefined objective function)\n")
+                         } else .showAffineExpr(.__obj, new.line = TRUE)
+                         cat("Subject to:\n")
+                         if (length(.__constraints) > 0) {
+                           for (i in 1:length(.__constraints)) {
+                             cat("\t")
+                             .showComparison(.__constraints[[i]])
+                           }
+                         } else {
+                           cat("(No defined constraints)\n")
+                         }
+                       },
                        var = function(defn, integer = "Real"){
                          defn <- match.call()$defn
                          bounds <- c(-Inf, Inf)
@@ -46,7 +67,7 @@
                              name <- as.character(defn[[2]])
                              indexDisplay <- paste(as.character(defn[3:length(defn)]), collapse = " \U24CD ")
                              txt <- paste0(name, " <- raml:::.defArray(\"", name, "\", c(", bounds[1], ",", bounds[2], ")", ",\"", integer, "\",", list(lapply(defn[3:length(defn)], eval)), ",\"", indexDisplay, "\")")
-                             variables <<- c(variables, name)
+                             .__variables <<- c(.__variables, name)
                              eval.parent(parse(text = txt))
                            } else {
                              stop(paste("Unknown error parsing", as.character(defn)))
@@ -54,13 +75,17 @@
                          } else {
                              name <- as.character(defn)
                              txt <- paste0(name, " <- raml:::.defVar(\"", name, "\", c(", bounds[1], ",", bounds[2], ")", ",\"", integer, "\")")
-                             variables <<- c(variables, name)
+                             .__variables <<- c(.__variables, name)
                              eval.parent(parse(text = txt))
                          }
                          invisible()
                        },
-                       constraint = function(){},
-                       objective = function(){}
+                       constraint = function(expr) {
+                         .__constraints <<- append(.__constraints, expr)
+                       },
+                       objective = function(expr){
+                         .__obj <<- .toAffineExpr(expr)
+                       }
                       )
 )
 
@@ -209,30 +234,36 @@ setClass("AffineExpr",
 #' Nice display for affine expressions.
 #' @export
 #' @param object The expression to be printed, of the "AffineExpr" class.
-setMethod("show", "AffineExpr", function(object) {
+setMethod("show", "AffineExpr", function(object) .showAffineExpr(object, new.line = TRUE))
+
+#' Generic for displaying affine expressions
+.showAffineExpr <- function(object, new.line = TRUE){
   out <- ""
-  if (object@offset != 0) {
+  if (object@offset != 0 || length(object@coefs) == 0) {
     out <- paste(object@offset)
   }
-  for (i in 1:length(object@coefs)) {
-    if (object@coefs[i] != 0) {
-      if (nchar(out) == 0) {
-        out <- paste0(object@coefs[i], "*", object@vars[i])
-      } else {
-        out <- paste0(out, " + ", object@coefs[i], "*", object@vars[i])
+  if (length(object@coefs) > 0) {
+    for (i in 1:length(object@coefs)) {
+      if (object@coefs[i] != 0) {
+        if (nchar(out) == 0) {
+          out <- paste0(object@coefs[i], "*", object@vars[i])
+        } else {
+          out <- paste0(out, " + ", object@coefs[i], "*", object@vars[i])
+        }
       }
     }
   }
-  cat(paste0(out, "\n"))
+  if (new.line) cat(paste0(out, "\n"))
+  else cat(out)
 }
-)
+
 
 #' Algebra within the raml ecosystem.
 #' @export
 #' @rdname raml-algebra
 #' @param e1 The first algebraic object.
 #' @param e2 The second algebraic object.
-#' @usage foo
+#' @usage Algebra
 setMethod("+", signature(e1 = "ramlVariable", e2 = "numeric"), function(e1, e2) {
   return(new("AffineExpr",
              vars = e1@name,
@@ -346,3 +377,111 @@ setMethod("-", signature(e1 = "AbstractRamlAlgObject", e2 = "AbstractRamlAlgObje
 setMethod("/", signature(e2 = "numeric", e1 = "AbstractRamlAlgObject"), function(e1, e2) {
   return(e1 * (1/e2))
 })
+
+#' A class that represents an affine combination of variables.
+#' @exportClass ramlComparison
+#' @section Slots:
+#'  \describe{
+#'    \item{\code{lhs}:}{Object of class \code{"AffineExpr"}, the left-hand side of the comparison.}
+#'    \item{\code{rhs}:}{Object of class \code{"AffineExpr"}, the rightt-hand side of the comparison.}
+#'    \item{\code{comp}:}{Object of class \code{"character"}, which indicates if the Comparison being made is \code{">="}, \code{"<="}, or \code{"=="}.}
+#'  }
+setClass("ramlComparison",
+         representation(lhs  = "AffineExpr",
+                        rhs  = "AffineExpr",
+                        comp = "character")
+)
+
+#' Nice display for algabraic comparisons.
+#' @export
+#' @param object The Comparison expression to be displayed.
+setMethod("show", signature("ramlComparison"), function(object) .showComparison(object))
+
+# Private function for displaying comparisions. Also used in the model printing routine.
+.showComparison <- function(object) {
+  .showAffineExpr(object@lhs, new.line = FALSE)
+  cat(paste0(" ", object@comp, " "))
+  .showAffineExpr(object@rhs, new.line = FALSE)
+}
+
+#' Function to coerce objects into affine expressions.
+setGeneric(".toAffineExpr", function(object) standardGeneric(".toAffineExpr"))
+
+#' Converts a single number into an affine expression.
+setMethod(".toAffineExpr", signature("numeric"), function(object){
+  if (length(object) == 1) { # Make sure the user isn't doing something weird
+    return(new("AffineExpr",
+               coefs = numeric(),
+               vars  = character(),
+               offset = object))
+  } else stop(paste("Expected argument to be of length 1, got", length(object), "instead."))
+})
+
+#' Converts a algebraic object into an affine expression.
+setMethod(".toAffineExpr", signature("AbstractRamlAlgObject"), function(object){
+  if (length(object) == 1) { # Make sure the user isn't doing something weird
+    return(1 * object)
+  } else stop(paste("Expected argument to be of length 1, got", length(object), "instead."))
+})
+
+#' Dummy function to convert an affine expression into itself.
+setMethod(".toAffineExpr", signature("AffineExpr"), function(object){
+  if (length(object) == 1) { # Make sure the user isn't doing something weird
+    return(object)
+  } else stop(paste("Expected argument to be of length 1, got", length(object), "instead."))
+})
+
+#' @export
+#' @rdname raml-algebra
+setMethod(">=", signature(e1 = "ANY", e2 = "AbstractRamlAlgObject"), function(e1, e2){
+  return(new("ramlComparison",
+             lhs = .toAffineExpr(e1),
+             rhs = .toAffineExpr(e2),
+             comp = ">="))
+})
+
+#' @export
+#' @rdname raml-algebra
+setMethod("<=", signature(e1 = "ANY", e2 = "AbstractRamlAlgObject"), function(e1, e2){
+  return(new("ramlComparison",
+             lhs = .toAffineExpr(e1),
+             rhs = .toAffineExpr(e2),
+             comp = "<="))
+})
+
+#' @export
+#' @rdname raml-algebra
+setMethod("==", signature(e1 = "ANY", e2 = "AbstractRamlAlgObject"), function(e1, e2){
+  return(new("ramlComparison",
+             lhs = .toAffineExpr(e1),
+             rhs = .toAffineExpr(e2),
+             comp = "=="))
+})
+
+#' @export
+#' @rdname raml-algebra
+setMethod(">=", signature(e2 = "ANY", e1 = "AbstractRamlAlgObject"), function(e1, e2){
+  return(new("ramlComparison",
+             lhs = .toAffineExpr(e1),
+             rhs = .toAffineExpr(e2),
+             comp = ">="))
+})
+
+#' @export
+#' @rdname raml-algebra
+setMethod("<=", signature(e2 = "ANY", e1 = "AbstractRamlAlgObject"), function(e1, e2){
+  return(new("ramlComparison",
+             lhs = .toAffineExpr(e1),
+             rhs = .toAffineExpr(e2),
+             comp = "<="))
+})
+
+#' @export
+#' @rdname raml-algebra
+setMethod("==", signature(e2 = "ANY", e1 = "AbstractRamlAlgObject"), function(e1, e2){
+  return(new("ramlComparison",
+             lhs = .toAffineExpr(e1),
+             rhs = .toAffineExpr(e2),
+             comp = "=="))
+})
+

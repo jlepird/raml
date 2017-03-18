@@ -17,9 +17,15 @@
 \alias{-,numeric,AbstractRamlAlgObject-method}
 \alias{-,AbstractRamlAlgObject,AbstractRamlAlgObject-method}
 \alias{/,AbstractRamlAlgObject,numeric-method}
+\alias{>=,ANY,AbstractRamlAlgObject-method}
+\alias{<=,ANY,AbstractRamlAlgObject-method}
+\alias{==,ANY,AbstractRamlAlgObject-method}
+\alias{>=,AbstractRamlAlgObject,ANY-method}
+\alias{<=,AbstractRamlAlgObject,ANY-method}
+\alias{==,AbstractRamlAlgObject,ANY-method}
 \title{Algebra within the raml ecosystem.}
 \usage{
-foo
+Algebra
 
 \S4method{+}{numeric,ramlVariable}(e1, e2)
 
@@ -48,6 +54,18 @@ foo
 \S4method{-}{AbstractRamlAlgObject,AbstractRamlAlgObject}(e1, e2)
 
 \S4method{/}{AbstractRamlAlgObject,numeric}(e1, e2)
+
+\S4method{>=}{ANY,AbstractRamlAlgObject}(e1, e2)
+
+\S4method{<=}{ANY,AbstractRamlAlgObject}(e1, e2)
+
+\S4method{==}{ANY,AbstractRamlAlgObject}(e1, e2)
+
+\S4method{>=}{AbstractRamlAlgObject,ANY}(e1, e2)
+
+\S4method{<=}{AbstractRamlAlgObject,ANY}(e1, e2)
+
+\S4method{==}{AbstractRamlAlgObject,ANY}(e1, e2)
 }
 \arguments{
 \item{e1}{The first algebraic object.}

@@ -9,6 +9,8 @@ expect_equal(x@name, "x")
 expect_equal(x@integer, "Real")
 expect_equal(capture.output(x), "x ∈ ℝ ∩ [0, Inf)")
 
+expect_error(m$var(x[[]]))
+
 m$var(y <= 10)
 expect_s4_class(y, "ramlVariable")
 expect_equal(y@bounds[1],-Inf)
@@ -123,3 +125,22 @@ expect_equal(capture.output(x + x),     "2*x")
 expect_equal(capture.output(x + x + y), "2*x + 1*y")
 expect_equal(capture.output(x - x + y), "1*y")
 expect_equal(capture.output(1 + x + y), "1 + 1*x + 1*y")
+
+expect_equal(capture.output(1 >= x), "1 >= 1*x")
+expect_equal(capture.output(1 <= x), "1 <= 1*x")
+expect_equal(capture.output(1 == x), "1 == 1*x")
+expect_equal(capture.output(x >= 1), "1*x >= 1")
+expect_equal(capture.output(x <= 1), "1*x <= 1")
+expect_equal(capture.output(x == 1), "1*x == 1")
+expect_equal(capture.output(x + y >= 0), "1*x + 1*y >= 0")
+
+expect_equal(capture.output(m), c("Minimize: (Undefined objective function)", "Subject to:", "(No defined constraints)"))
+
+m$objective(x + y)
+expect_equal(capture.output(m), c("Minimize: 1*x + 1*y", "Subject to:", "(No defined constraints)"))
+
+m$constraint(x + y >= 0)
+expect_equal(capture.output(m), c("Minimize: 1*x + 1*y", "Subject to:", "\t1*x + 1*y >= 0"))
+
+m$sense <- "max"
+expect_equal(capture.output(m), c("Maximize: 1*x + 1*y", "Subject to:", "\t1*x + 1*y >= 0"))
