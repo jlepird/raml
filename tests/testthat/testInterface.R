@@ -37,6 +37,9 @@ expect_equal(a@name, "a")
 expect_equal(a@integer, "Real")
 expect_equal(length(a@indicies), 10)
 expect_equal(capture.output(a), "a[i] ∈ ℝ ∩ [0, Inf) ∀ i ∈ 1:10")
+expect_equal(a[1], a_1)
+expect_equal(capture.output(a[1]), "a[1] ∈ ℝ ∩ [0, Inf)")
+expect_error(a[1,1])
 
 m$var(b[1:10, 1:10] >= 0)
 expect_s4_class(b, "ramlArray")
@@ -48,6 +51,13 @@ expect_equal(b@name, "b")
 expect_equal(b@integer, "Real")
 expect_equal(length(b@indicies), 100)
 expect_equal(capture.output(b), "b[i] ∈ ℝ ∩ [0, Inf) ∀ i ∈ 1:10 Ⓧ 1:10")
+expect_equal(b[1,1], b_1_1)
+expect_equal(capture.output(b[1,1]), "b[1,1] ∈ ℝ ∩ [0, Inf)")
+expect_error(b[1])
+
+m$var(d[1:2,1:2,1:2])
+expect_equal(d[1,1,1], d_1_1_1)
+expect_error(d[1,1,1,1,1])
 
 m$var(bin, integer = "Binary")
 expect_equal(bin@integer, "Binary")
@@ -146,5 +156,4 @@ m$sense <- "max"
 expect_equal(capture.output(m), c("Maximize: 1*x + 1*y", "Subject to:", "\t1*x + 1*y >= 0"))
 
 m$constraint(x + y >= 1)
-
 expect_equal(capture.output(m), c("Maximize: 1*x + 1*y", "Subject to:", "\t1*x + 1*y >= 0", "\t1*x + 1*y >= 1"))

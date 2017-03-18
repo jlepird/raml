@@ -7,3 +7,10 @@
 \description{
 A class that represents a single variable
 }
+\section{Slots}{
+
+ \describe{
+   \item{\code{parent}:}{Object of class \code{"character"}-- the name of the array this variable is a part of. Array of length 0 if variable is not part of array..}
+ }
+}
+

@@ -10,7 +10,7 @@ An abstract class that represents arrays or variables that conform to algebraic 
 \section{Slots}{
 
  \describe{
-   \item{\code{name}:}{Objectx of class \code{"character"}-- the name of the variable in the user's scope.}
+   \item{\code{name}:}{Object of class \code{"character"}-- the name of the variable in the user's scope.}
    \item{\code{bounds}:}{Object of class \code{"numeric"}, which defines the lower and upper bounds of the variable's domain.}
    \item{\code{integer}:}{Object of class \code{"character"}, which defines if the variable is a \code{"Real"}, \code{"Integer"}, or \code{"Binary"}}
    \item{\code{value}:}{Object of class \code{"numeric"}, the value of the variable at the model's optimum.}

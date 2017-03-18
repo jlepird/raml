@@ -104,7 +104,7 @@ setClass("AbstractRamlAlgObject",
 #' @exportClass ramlAlgObject
 #' @section Slots:
 #'  \describe{
-#'    \item{\code{name}:}{Objectx of class \code{"character"}-- the name of the variable in the user's scope.}
+#'    \item{\code{name}:}{Object of class \code{"character"}-- the name of the variable in the user's scope.}
 #'    \item{\code{bounds}:}{Object of class \code{"numeric"}, which defines the lower and upper bounds of the variable's domain.}
 #'    \item{\code{integer}:}{Object of class \code{"character"}, which defines if the variable is a \code{"Real"}, \code{"Integer"}, or \code{"Binary"}}
 #'    \item{\code{value}:}{Object of class \code{"numeric"}, the value of the variable at the model's optimum.}
@@ -118,14 +118,22 @@ setClass("ramlAlgObject",
 
 #' A class that represents a single variable
 #' @exportClass ramlVariable
-setClass("ramlVariable", contains = "ramlAlgObject")
+#' @section Slots:
+#'  \describe{
+#'    \item{\code{parent}:}{Object of class \code{"character"}-- the name of the array this variable is a part of. Array of length 0 if variable is not part of array..}
+#'  }
+setClass("ramlVariable",
+         representation(parent = "character"),
+         prototype(parent = character()),
+         contains = "ramlAlgObject")
 
-.defVar <- function(name, bounds, integer){
+.defVar <- function(name, bounds, integer, parent = character()){
   out <- new("ramlVariable",
               name = name,
               bounds = bounds,
               integer = integer,
-              value = NA_real_)
+              value = NA_real_,
+              parent = parent)
   return(out)
 }
 
@@ -156,16 +164,34 @@ setClass("ramlArray",
   for (i in 1:nrow(all.indicies)) {
     # raml:::.defVar(paste0(name, all.indicies$index[i], bounds, integer))
     name2 <- paste0(name, all.indicies$index[i])
-    txt <- paste0(name2, " <- raml:::.defVar(\"", name2 , "\", c(", bounds[1], ",", bounds[2], ")", ",\"", integer, "\")")
+    txt <- paste0(name2, " <- raml:::.defVar(\"", name2 , "\", c(", bounds[1], ",", bounds[2], ")", ",\"", integer, "\",\"", name, "\")")
     eval.parent(parse(text = txt))
   }
   return(out)
 }
 
+#' Natural subsetting for indicies
+#' @export
+#' @rdname raml-algebra
+setMethod("[", signature(x = "ramlArray"), function(x, i, j, ..., drop = TRUE) {
+    dimen <- length(strsplit(gsub(x@name, "foo", x@indicies[1]), "_")[[1]]) - 1
+    if (missing(j)) {
+      if (dimen != 1) stop(paste0("Wrong number of indicies-- expected ", dimen, ", got 1."))
+      return(eval.parent(parse(text = paste0(x@name, "_", i))))
+    } else if (missing(...)) {
+      if (dimen != 2) stop(paste0("Wrong number of indicies-- expected ", dimen, ", got 2."))
+      return(eval.parent(parse(text = paste0(x@name, "_", i, "_", j))))
+    } else {
+      if (dimen != 2 + length(list(...))) stop(paste0("Wrong number of indicies-- expected ", dimen, ", got ", 2 + length(list(...)), "."))
+      return(eval.parent(parse(text = paste0(x@name, "_", i, "_", j, "_", paste(..., collapse = "_")))))
+    }
+})
+
 #' Nice display for single variables.
 #' @param object The variable to be printed, of the "ramlVariable" class.
 #' @param new.line Should the print add a new line at the end?
-.printVar <- function(object, new.line = TRUE){
+#' @param in.array Is the variable actually an array?
+.printVar <- function(object, new.line = TRUE, is.array = FALSE){
   lbBracket <- "["
   if (object@bounds[1] == -Inf) {
     lbBracket <- "("
@@ -189,8 +215,16 @@ setClass("ramlArray",
     boundStatement <- paste0(" \U2229 ",lbBracket, object@bounds[1],", ", object@bounds[2], ubBracket)
   }
 
+  if (!is.array && length(object@parent) > 0) { # then the variable name is part of an array
+      name <- gsub(object@parent, "", object@name)
+      name <- strsplit(name, "_")[[1]]
+      name <- paste0(object@parent, "[", paste(name[2:length(name)], collapse = ","), "]")
+  } else {
+    name <- object@name
+  }
+
   # U2208 is \in
-  cat(paste0(object@name, " \U2208 ", field, boundStatement))
+  cat(paste0(name, " \U2208 ", field, boundStatement))
 
   if (new.line) {
     cat("\n")
@@ -211,7 +245,7 @@ setMethod("show", "ramlVariable", function(object){
 #' @param object The variable to be printed, of the "ramlArray" class.
 setMethod("show", "ramlArray", function(object){
   object@name <- paste0(object@name, "[i]")
-  .printVar(object, new.line = FALSE)
+  .printVar(object, new.line = FALSE, is.array = TRUE)
   cat(paste(" \U2200 i \U2208", object@indexDisplay))
   cat("\n")
 }
