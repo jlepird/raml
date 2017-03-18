@@ -173,6 +173,11 @@ setClass("ramlArray",
 #' Natural subsetting for indicies
 #' @export
 #' @rdname raml-algebra
+#' @param x The object of \code{"ramlArray"} to be subsetted.
+#' @param i The first index.
+#' @param j The second index (if needed).
+#' @param ... Additional indicies.
+#' @param drop (Not used).
 setMethod("[", signature(x = "ramlArray"), function(x, i, j, ..., drop = TRUE) {
     dimen <- length(strsplit(gsub(x@name, "foo", x@indicies[1]), "_")[[1]]) - 1
     if (missing(j)) {
