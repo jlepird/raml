@@ -36,6 +36,7 @@
                            for (i in 1:length(.__constraints)) {
                              cat("\t")
                              .showComparison(.__constraints[[i]])
+                             cat("\n")
                            }
                          } else {
                            cat("(No defined constraints)\n")

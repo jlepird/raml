@@ -144,3 +144,7 @@ expect_equal(capture.output(m), c("Minimize: 1*x + 1*y", "Subject to:", "\t1*x +
 
 m$sense <- "max"
 expect_equal(capture.output(m), c("Maximize: 1*x + 1*y", "Subject to:", "\t1*x + 1*y >= 0"))
+
+m$constraint(x + y >= 1)
+
+expect_equal(capture.output(m), c("Maximize: 1*x + 1*y", "Subject to:", "\t1*x + 1*y >= 0", "\t1*x + 1*y >= 1"))
