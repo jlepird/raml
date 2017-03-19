@@ -1,33 +1,52 @@
-readme\_test.md
-================
+# raml
+[![Travis-CI Build Status](https://travis-ci.org/jlepird/raml.svg?branch=master)](https://travis-ci.org/jlepird/raml)
+[![Code Coverage](https://codecov.io/gh/jlepird/raml/branch/master/graph/badge.svg)](https://codecov.io/gh/jlepird/raml)
+[![License](https://img.shields.io/npm/l/express.svg)](https://www.r-project.org/Licenses/MIT)
 
-GitHub Documents
-----------------
+The `raml` package provides an elementary algebraic modeling language (AML) in the R ecosystem.
 
-This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated.
+## Installation
 
-Including Code
---------------
+You can install raml from github with:
 
-You can include R code in the document as follows:
-
-``` r
-summary(cars)
+```R
+# install.packages("devtools")
+devtools::install_github("jlepird/raml")
 ```
 
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
+## Hello, World Example
 
-Including Plots
----------------
+This example shows you how to solve the basic linear optimization problem:
 
-You can also embed plots, for example:
+```
+max x + 2y
+Subject to:
+  x + y <= 5
+x, y Positive and Real.
+```
 
-![](README_files/figure-markdown_github/pressure-1.png)
+```R
+library(raml)
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+m <- Model()
+
+m$var(x >= 0)
+m$var(y >= 0)
+
+m$objective(x + 2*y)
+
+m$constraint(x + y <= 5)
+
+m$sense <- "max"
+
+m$solve()
+
+## Output:
+## Optimal solution found.
+## The objective value is: 10
+
+value(x) # 0
+value(y) # 5
+
+dual(m, x + y <= 5) # 2.0, the shadow cost of the constraint x + y <= 5.
+```
