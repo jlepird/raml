@@ -36,3 +36,10 @@ m$sense <- "max"
 
 m$solve()
 expect_equal(x@value, 1)
+
+m <- Model()
+m$var(x[1:3] >= 0)
+m$objective(dot(rep(1,3), x))
+m$constraint(dot(rep(1,3), x) >= 0)
+m$sense <- "min"
+m$solve()

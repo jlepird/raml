@@ -3,8 +3,8 @@ library(ROI)
 #' @importFrom ROI L_constraint
 #' @importFrom ROI V_bound
 #' @importFrom ROI ROI_solve
-.solve <- function(vars, constraints, obj, sense) {
-  varData <- .expand.vars(vars)
+.solve <- function(varsIn, constraints, obj, sense) {
+  varData <- .expand.vars(varsIn)
   vars <- varData$names
   m <- length(constraints)
   n <- length(vars)
@@ -59,6 +59,7 @@ library(ROI)
 
  if (soln$status$code == 0) {
    .populateGlobal(vars, soln)
+   .synchArrays(varsIn)
  } else {
    warning(soln$status$msg$message)
  }
@@ -97,3 +98,15 @@ return(soln)
   }
 }
 
+.synchArrays <- function(vars) {
+  for (var in vars) {
+    var <- eval.parent(parse(text = var), n = 3)
+    if ("ramlArray" %in% class(var)) {
+      out <- numeric(length(var@indicies))
+      for (i in 1:length(var@indicies)) {
+        out[i] <- eval.parent(parse(text = paste0(var@name, var@indicies[i], "@value")), n = 3)
+      }
+      eval.parent(parse(text = paste0(var@name, "@value <- c(", paste0(out, collapse = ","), ")")), n = 3)
+    }
+  }
+}
