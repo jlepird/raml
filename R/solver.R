@@ -1,7 +1,11 @@
-require("lpSolve")
-#' @importFrom lpSolve lp
+library(ROI)
+#' @importFrom ROI OP
+#' @importFrom ROI L_constraint
+#' @importFrom ROI V_bound
+#' @importFrom ROI ROI_solve
 .solve <- function(vars, constraints, obj, sense) {
-  vars <- .expand.vars(vars)
+  varData <- .expand.vars(vars)
+  vars <- varData$names
   m <- length(constraints)
   n <- length(vars)
   A <- matrix(0, nrow = m, ncol = n)
@@ -9,8 +13,6 @@ require("lpSolve")
   colnames(A) <- vars
   comps <- character(length = m)
   b <- numeric(length = m)
-  intVars <- numeric()
-  binVars <- numeric()
   matO <- numeric(length = length(vars))
   names(matO) <- vars
   if (length(obj@coefs) > 0) {
@@ -27,34 +29,52 @@ require("lpSolve")
     comps[i] <- constraints[[i]]@comp
   }
 
-  soln <- lp(objective.in = matO,
-            const.mat = A,
-            const.dir = comps,
-            const.rhs = b,
-            direction = sense
+  li <- which(varData$bounds$lower != 0)
+  lb <- varData$bounds$lower[li]
+  ui <- which(varData$bounds$upper != Inf)
+  ub <- varData$bounds$upper[ui]
+  prob <- OP(objective = matO,
+            constraints = L_constraint(L = A,
+                                       dir = comps,
+                                       rhs = b),
+            maximum = (sense == "max"),
+            bounds = V_bound(li, ui, lb, ub)
             )
- .populateGlobal(vars, soln)
- return(soln)
+ soln <- ROI_solve(prob)
+
+ if (soln$status$code == 0) {
+   .populateGlobal(vars, soln)
+ } else {
+   warning(soln$status$msg$message)
+ }
+return(soln)
 }
 
 .expand.vars <- function(vars) {
-  varOut <- character()
+  varOut <- list(names = character(),
+                 bounds = list(lower = numeric(),
+                               upper = numeric()),
+                 type = character())
   for (varName in vars) {
     var <- eval.parent(parse(text = varName), n = 3)
     if ("ramlVariable" %in% class(var)) {
-      varOut <- c(varOut, var@name)
+      varOut$names <- c(varOut$names, var@name)
+      varOut$bounds$lower <- c(varOut$bounds$lower, var@bounds[1])
+      varOut$bounds$upper <- c(varOut$bounds$upper, var@bounds[2])
     } else if ("ramlArray" %in% class(var)) {
       for (index in var@indicies) {
-        varOut <- c(varOut, paste0(var@name, index))
-        }
+        varOut$names <- c(varOut$names, paste0(var@name, index))
+        varOut$bounds$lower <- c(varOut$bounds$lower, var@bounds[1])
+        varOut$bounds$upper <- c(varOut$bounds$upper, var@bounds[2])
+      }
     }
   }
   return(varOut)
 }
 
 .populateGlobal <- function(vars, soln) {
-  for (i in 1:length(vars)) {
-    eval.parent(parse(text = paste0(vars[i], "@value <- ", soln$solution[i])), n = 3)
+  for (var in vars) {
+    eval.parent(parse(text = paste0(var, "@value <- ", soln$solution[var])), n = 3)
   }
 }
 
