@@ -2,11 +2,13 @@
 #' @name RAMLModel
 #' @import methods
 #' @field sense Should the objective be minimized ("min") or maximized ("max")?
+#' @field soln An object of class \code{"OP_solution"} that contains information about the problem solution.
 #' @field .__obj (Internal use only) The objective function of the model.
 #' @field .__constraints (Internal use only) A list of constraints of the model.
 #' @field .__variables (Internal use only) An array of the variables declared in the model.
 .Model <- setRefClass("RAMLModel",
                      fields = c("sense",
+                                "soln",
                                 ".__obj",
                                 ".__constraints",
                                 ".__variables"),
@@ -18,6 +20,7 @@
                          .__obj         <<- NULL
                          .__constraints <<- list()
                          .__variables   <<- NULL
+                         soln           <<- NULL
 
                          # Call super to override any defaults
                          callSuper(...)
@@ -88,8 +91,8 @@
                          .__obj <<- .toAffineExpr(expr)
                        },
                        solve = function() {
-                          prob <- .solve(.__variables, .__constraints, .__obj, sense)
-                          return(prob)
+                          soln <<- .solve(.__variables, .__constraints, .__obj, sense)
+                          cat(paste0("Optimal solution found.\nThe objective value is: ", soln$objval, "\n"))
                        }
                       )
 )
@@ -584,4 +587,46 @@ setMethod("dot", signature(b = "numeric", a = "ramlArray"), function(a, b) {
     out <- out + a[i] * eval.parent(parse(text = paste0(b@name, b@indicies[i])))
   }
   return(out)
+})
+
+#' A helper function that extracts the value of a variable.
+#' @param x The object.
+#' @export
+#' @rdname value
+#' @example
+#' m <- Model()
+#' m$var(x >= 0)
+#' m$objective(x)
+#' m$constraint(x >= 0.1)
+#' value(x) # NA
+#' m$solve()
+#' value(x) # 0.1
+setGeneric("value", function(x) standardGeneric("value"))
+
+#' @export
+#' @rdname value
+setMethod("value", signature("ramlAlgObject"), function(x) return(x@value))
+
+#' A helper function that extracts the dual value (shadow cost) of a constraint.
+#' @param m The model object.
+#' @param constr The constraint in question.
+#' @export
+#' @rdname dual
+#' @return The dual value (shadow cost) of a constraint. Returns \code{NA} if there are integer or binary variables in the model.
+#' @example
+#' m <- Model()
+#' m$var(x >= 0)
+#' m$objective(x)
+#' m$constraint(x >= 0.1)
+#' m$solve()
+#' dual(m, x >= 0.1) # 1.0
+setGeneric("dual", function(m, constr) standardGeneric("dual"))
+
+#' @export
+#' @rdname dual
+#' @importFrom utils capture.output
+setMethod("dual", signature("RAMLModel", "ramlComparison"), function(m, constr) {
+  constrID <- which(do.call(c, lapply(m$.__constraints, function(foo) identical(constr, foo))))
+  length(constrID) == 1 && return(m$soln$message$auxiliary$dual[constrID])
+  stop(paste0("Constraint ", capture.output(constr), " not found in model."))
 })

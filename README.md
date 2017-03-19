@@ -1,23 +1,33 @@
-# raml
-[![Travis-CI Build Status](https://travis-ci.org/jlepird/raml.svg?branch=master)](https://travis-ci.org/jlepird/raml)
-[![Code Coverage](https://codecov.io/gh/jlepird/raml/branch/master/graph/badge.svg)](https://codecov.io/gh/jlepird/raml)
-[![License](https://img.shields.io/npm/l/express.svg)](https://www.r-project.org/Licenses/MIT)
+readme\_test.md
+================
 
-The goal of raml is to ...
+GitHub Documents
+----------------
 
-## Installation
+This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated.
 
-You can install raml from github with:
+Including Code
+--------------
 
-```R
-# install.packages("devtools")
-devtools::install_github("jlepird/raml")
+You can include R code in the document as follows:
+
+``` r
+summary(cars)
 ```
 
-## Example
+    ##      speed           dist       
+    ##  Min.   : 4.0   Min.   :  2.00  
+    ##  1st Qu.:12.0   1st Qu.: 26.00  
+    ##  Median :15.0   Median : 36.00  
+    ##  Mean   :15.4   Mean   : 42.98  
+    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
+    ##  Max.   :25.0   Max.   :120.00
 
-This is a basic example which shows you how to solve a common problem:
+Including Plots
+---------------
 
-```R
-...
-```
+You can also embed plots, for example:
+
+![](README_files/figure-markdown_github/pressure-1.png)
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

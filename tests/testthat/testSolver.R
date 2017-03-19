@@ -9,8 +9,11 @@ m$constraint(x <= 1)
 m$sense = "max"
 
 m$solve()
-expect_equal(x@value, 1)
-expect_equal(y@value, 1)
+expect_equal(value(x), 1)
+expect_equal(value(y), 1)
+expect_equal(dual(m, x + y <= 2), 1)
+expect_equal(dual(m, x <= 1), 0)
+expect_error(dual(m, y <= 2))
 
 m$sense <- "min"
 expect_warning(m$solve())
@@ -26,7 +29,7 @@ m$objective(x)
 m$sense <- "max"
 
 m$solve()
-expect_equal(x@value, 1)
+expect_equal(value(x), 1)
 
 m <- Model()
 m$var(x >= 0, "Binary")
@@ -35,7 +38,7 @@ m$objective(x)
 m$sense <- "max"
 
 m$solve()
-expect_equal(x@value, 1)
+expect_equal(value(x), 1)
 
 m <- Model()
 m$var(x[1:3] >= 0)
