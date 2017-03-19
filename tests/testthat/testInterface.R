@@ -157,3 +157,7 @@ expect_equal(capture.output(m), c("Maximize: 1*x + 1*y", "Subject to:", "\t1*x +
 
 m$constraint(x + y >= 1)
 expect_equal(capture.output(m), c("Maximize: 1*x + 1*y", "Subject to:", "\t1*x + 1*y >= 0", "\t1*x + 1*y >= 1"))
+
+expect_equal(dot(rep(1, 10), a), dot(a, rep(1, 10)))
+m$var(ary[1:3] >= 0)
+expect_equal(dot(c(1,2,3), ary), 1 * ary[1] + 2 * ary[2] + 3 * ary[3])

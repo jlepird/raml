@@ -86,6 +86,10 @@
                        },
                        objective = function(expr){
                          .__obj <<- .toAffineExpr(expr)
+                       },
+                       solve = function() {
+                          prob <- .solve(.__variables, .__constraints, .__obj, sense)
+                          return(prob)
                        }
                       )
 )
@@ -288,7 +292,7 @@ setMethod("show", "AffineExpr", function(object) .showAffineExpr(object, new.lin
         if (nchar(out) == 0) {
           out <- paste0(object@coefs[i], "*", object@vars[i])
         } else {
-          out <- paste0(out, " + ", object@coefs[i], "*", object@vars[i])
+          out <- paste0(out, " + ", object@coefs[i], "*",  object@vars[i])
         }
       }
     }
@@ -364,17 +368,19 @@ setMethod("+", signature(e2 = "ramlVariable", e1 = "AffineExpr"), function(e1, e
 #' @export
 #' @rdname raml-algebra
 setMethod("+", signature(e1 = "AffineExpr", e2 = "AffineExpr"), function(e1, e2){
-      for (i in 1:length(e2@vars)) {
-          if (e2@vars[i] %in% e1@vars) {
-            e1@coefs[which(e1@vars == e2@vars[i])] <-
-              e1@coefs[which(e1@vars == e2@vars[i])] + e2@coefs[i]
-          } else {
-            e1@vars <- c(e1@vars, e2@vars[i])
-            e1@coefs <- c(e1@coefs, e2@coefs[i])
-          }
+      if (length(e2@vars) > 0) {
+        for (i in 1:length(e2@vars)) {
+            if (e2@vars[i] %in% e1@vars) {
+              e1@coefs[which(e1@vars == e2@vars[i])] <-
+                e1@coefs[which(e1@vars == e2@vars[i])] + e2@coefs[i]
+            } else {
+              e1@vars <- c(e1@vars, e2@vars[i])
+              e1@coefs <- c(e1@coefs, e2@coefs[i])
+            }
         }
-        e1@offset <- e1@offset + e2@offset
-        return(e1)
+      }
+      e1@offset <- e1@offset + e2@offset
+      return(e1)
 })
 
 #' @export
@@ -525,3 +531,57 @@ setMethod("==", signature(e2 = "ANY", e1 = "AbstractRamlAlgObject"), function(e1
              comp = "=="))
 })
 
+#' Takes the inner product of a variable array and a numeric array.
+#' @export
+#' @param a An array of class \code{"numeric"}.
+#' @param b An array of variables.
+#' @rdname dots
+#' @examples
+#' m <- Model()
+#' m$var(x[1:3] >= 0)
+#' m$constraint(dot(x, c(1,1,1)) >= 1)
+#' show(m)
+setGeneric("dot", function(a, b) standardGeneric("dot"))
+
+#' @export
+#' @rdname dots
+setMethod("dot", signature(a = "numeric", b = "ramlArray"), function(a, b) {
+  length(a) == length(b@indicies) ||
+    stop(paste0("Dimension mismatch: length of dot product arguments must match. Got length(numeric) = ", length(a), " and length(array) = ", length(b@indicies)))
+
+  indx <- b@indicies[1]
+
+  length(gsub("_", "", indx)) != length(indx) - 1 ||
+    stop("Dot product only defined for one-dimensional vectors.")
+
+  out <- 0
+  for (i in 1:length(a)) {
+    out <- out + a[i] * eval.parent(parse(text = paste0(b@name, b@indicies[i])))
+  }
+  return(out)
+})
+
+#' @export
+#' @rdname dots
+setMethod("dot", signature(b = "numeric", a = "ramlArray"), function(a, b) {
+  # Due to issues with variables existing in the right scope, we can't just
+  # call dot(b, a), as eval.parent would call *here*, not where
+  tmp <- a
+  a   <- b
+  b   <- tmp
+
+  length(a) == length(b@indicies) ||
+    stop(paste0("Dimension mismatch: length of dot product arguments must match. Got length(numeric) = ", length(a), " and length(array) = ", length(b@indicies)))
+
+  indx <- b@indicies[1]
+
+  length(gsub("_", "", indx)) != length(indx) - 1 ||
+    stop("Dot product only defined for one-dimensional vectors.")
+
+  out <- 0
+  eval.parent(parse(text = "print(ls())"))
+  for (i in 1:length(a)) {
+    out <- out + a[i] * eval.parent(parse(text = paste0(b@name, b@indicies[i])))
+  }
+  return(out)
+})
