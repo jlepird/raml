@@ -33,12 +33,27 @@ library(ROI)
   lb <- varData$bounds$lower[li]
   ui <- which(varData$bounds$upper != Inf)
   ub <- varData$bounds$upper[ui]
+
+  bounds <- NULL
+  if (length(li) == 0) {
+    if (length(ui) > 0) {
+      bounds <- V_bound(ui = ui, ub = ub)
+    }
+  } else {
+    if (length(ui) > 0) {
+      bounds <- V_bound(li, ui, lb, ub)
+    } else {
+      bounds <- V_bound(li = li, lb = lb)
+    }
+  }
+
   prob <- OP(objective = matO,
             constraints = L_constraint(L = A,
                                        dir = comps,
                                        rhs = b),
             maximum = (sense == "max"),
-            bounds = V_bound(li, ui, lb, ub)
+            bounds = bounds,
+            types = varData$type
             )
  soln <- ROI_solve(prob)
 
@@ -61,11 +76,15 @@ return(soln)
       varOut$names <- c(varOut$names, var@name)
       varOut$bounds$lower <- c(varOut$bounds$lower, var@bounds[1])
       varOut$bounds$upper <- c(varOut$bounds$upper, var@bounds[2])
+      varOut$type <- c(varOut$type, ifelse(var@integer == "Binary", "B",
+                                    ifelse(var@integer == "Integer", "I", "C")))
     } else if ("ramlArray" %in% class(var)) {
       for (index in var@indicies) {
         varOut$names <- c(varOut$names, paste0(var@name, index))
         varOut$bounds$lower <- c(varOut$bounds$lower, var@bounds[1])
         varOut$bounds$upper <- c(varOut$bounds$upper, var@bounds[2])
+        varOut$type <- c(varOut$type, ifelse(var@integer == "Binary", "B",
+                                      ifelse(var@integer == "Integer", "I", "C")))
       }
     }
   }

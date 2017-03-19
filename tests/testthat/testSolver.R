@@ -18,3 +18,21 @@ expect_warning(m$solve())
 m$sense <- "max"
 m$constraint(x >= 2)
 expect_warning(m$solve())
+
+m <- Model()
+m$var(x >= 0, "Integer")
+m$constraint(x <= 1.5)
+m$objective(x)
+m$sense <- "max"
+
+m$solve()
+expect_equal(x@value, 1)
+
+m <- Model()
+m$var(x >= 0, "Binary")
+m$constraint(x <= 1.5)
+m$objective(x)
+m$sense <- "max"
+
+m$solve()
+expect_equal(x@value, 1)
