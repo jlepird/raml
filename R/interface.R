@@ -14,7 +14,7 @@
                        initialize = function(...){
 
                          # Provide default values
-                         sense         <<- "min"
+                         sense          <<- "min"
                          .__obj         <<- NULL
                          .__constraints <<- list()
                          .__variables   <<- NULL
