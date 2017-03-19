@@ -86,6 +86,10 @@
                        },
                        objective = function(expr){
                          .__obj <<- .toAffineExpr(expr)
+                       },
+                       solve = function() {
+                          prob <- .solve(.__variables, .__constraints, .__obj, sense)
+                          return(prob)
                        }
                       )
 )
@@ -364,17 +368,19 @@ setMethod("+", signature(e2 = "ramlVariable", e1 = "AffineExpr"), function(e1, e
 #' @export
 #' @rdname raml-algebra
 setMethod("+", signature(e1 = "AffineExpr", e2 = "AffineExpr"), function(e1, e2){
-      for (i in 1:length(e2@vars)) {
-          if (e2@vars[i] %in% e1@vars) {
-            e1@coefs[which(e1@vars == e2@vars[i])] <-
-              e1@coefs[which(e1@vars == e2@vars[i])] + e2@coefs[i]
-          } else {
-            e1@vars <- c(e1@vars, e2@vars[i])
-            e1@coefs <- c(e1@coefs, e2@coefs[i])
-          }
+      if (length(e2@vars) > 0) {
+        for (i in 1:length(e2@vars)) {
+            if (e2@vars[i] %in% e1@vars) {
+              e1@coefs[which(e1@vars == e2@vars[i])] <-
+                e1@coefs[which(e1@vars == e2@vars[i])] + e2@coefs[i]
+            } else {
+              e1@vars <- c(e1@vars, e2@vars[i])
+              e1@coefs <- c(e1@coefs, e2@coefs[i])
+            }
         }
-        e1@offset <- e1@offset + e2@offset
-        return(e1)
+      }
+      e1@offset <- e1@offset + e2@offset
+      return(e1)
 })
 
 #' @export

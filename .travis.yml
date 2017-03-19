@@ -9,6 +9,3 @@ r_github_packages:
 
 after_success:
   - Rscript -e 'covr::codecov()'
-
-after_failure:
-  - cat /home/travis/build/jlepird/raml/raml.Rcheck/00install.out
