@@ -3,7 +3,7 @@
 [![Code Coverage](https://codecov.io/gh/jlepird/raml/branch/master/graph/badge.svg)](https://codecov.io/gh/jlepird/raml)
 [![License](https://img.shields.io/npm/l/express.svg)](https://www.r-project.org/Licenses/MIT)
 
-The goal of raml is to ...
+The `raml` package provides an elementary algebraic modeling language (AML) in the R ecosystem.
 
 ## Installation
 
@@ -19,5 +19,27 @@ devtools::install_github("jlepird/raml")
 This is a basic example which shows you how to solve a common problem:
 
 ```R
-...
+library(raml)
+
+m <- Model()
+
+m$var(x >= 0)
+m$var(y >= 0)
+
+m$objective(x + 2*y)
+
+m$constraint(x + y <= 5)
+
+m$sense <- "max"
+
+m$solve()
+
+## Output:
+## Optimal solution found.
+## The objective value is: 10
+
+value(x) # 0
+value(y) # 5
+
+dual(m, x + y <= 5) # 2.0, the shadow cost of the constraint x + y <= 5.
 ```
