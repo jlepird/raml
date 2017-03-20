@@ -22,7 +22,7 @@ This example shows you how to solve the basic linear optimization problem:
 max x + 2y
 Subject to:
   x + y <= 5
-x, y Positive and Real.
+x, y Nonnegative and Real.
 ```
 
 ```R
@@ -40,7 +40,6 @@ m$constraint(x + y <= 5)
 m$sense <- "max"
 
 m$solve()
-
 ## Output:
 ## Optimal solution found.
 ## The objective value is: 10
