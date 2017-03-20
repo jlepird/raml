@@ -305,12 +305,20 @@ setMethod("show", "AffineExpr", function(object) .showAffineExpr(object, new.lin
 }
 
 
-#' Algebra within the raml ecosystem.
+#' Algebra within the raml ecosystem behaves exactly as you'd expect it to.
 #' @export
 #' @rdname raml-algebra
 #' @param e1 The first algebraic object.
 #' @param e2 The second algebraic object.
-#' @usage Algebra
+#' @example
+#' #' m <- Model()
+#' m$var(x)
+#' m$var(y)
+#' #' x + x == 2 * x
+#' x - x == 0 * x
+#' x + y + x == x + x + y
+#' m$objective(x + y)
+#' m$constraint(x + 2 * y <= 3)
 setMethod("+", signature(e1 = "ramlVariable", e2 = "numeric"), function(e1, e2) {
   return(new("AffineExpr",
              vars = e1@name,
@@ -607,13 +615,14 @@ setGeneric("value", function(x) standardGeneric("value"))
 #' @rdname value
 setMethod("value", signature("ramlAlgObject"), function(x) return(x@value))
 
-#' A helper function that extracts the dual value (shadow cost) of a constraint.
+#' Extracts the dual value (shadow cost) of a constraint.
 #' @param m The model object.
 #' @param constr The constraint in question.
-#' @export
+#' @exportMethod dual
 #' @rdname dual
 #' @return The dual value (shadow cost) of a constraint. Returns \code{NA} if there are integer or binary variables in the model.
-#' @example
+#' @usage dual(m, constr)
+#' @examples
 #' m <- Model()
 #' m$var(x >= 0)
 #' m$objective(x)
@@ -622,9 +631,10 @@ setMethod("value", signature("ramlAlgObject"), function(x) return(x@value))
 #' dual(m, x >= 0.1) # 1.0
 setGeneric("dual", function(m, constr) standardGeneric("dual"))
 
-#' @export
+#' @exportMethod dual
 #' @rdname dual
 #' @importFrom utils capture.output
+#' @usage dual(m, constr)
 setMethod("dual", signature("RAMLModel", "ramlComparison"), function(m, constr) {
   constrID <- which(do.call(c, lapply(m$.__constraints, function(foo) identical(constr, foo))))
   length(constrID) == 1 && return(m$soln$message$auxiliary$dual[constrID])

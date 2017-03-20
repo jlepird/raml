@@ -4,11 +4,11 @@
 \name{dual}
 \alias{dual}
 \alias{dual,RAMLModel,ramlComparison-method}
-\title{A helper function that extracts the dual value (shadow cost) of a constraint.}
+\title{Extracts the dual value (shadow cost) of a constraint.}
 \usage{
 dual(m, constr)
 
-\S4method{dual}{RAMLModel,ramlComparison}(m, constr)
+dual(m, constr)
 }
 \arguments{
 \item{m}{The model object.}
@@ -19,5 +19,13 @@ dual(m, constr)
 The dual value (shadow cost) of a constraint. Returns \code{NA} if there are integer or binary variables in the model.
 }
 \description{
-A helper function that extracts the dual value (shadow cost) of a constraint.
+Extracts the dual value (shadow cost) of a constraint.
+}
+\examples{
+m <- Model()
+m$var(x >= 0)
+m$objective(x)
+m$constraint(x >= 0.1)
+m$solve()
+dual(m, x >= 0.1) # 1.0
 }

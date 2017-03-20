@@ -2,7 +2,6 @@
 
 export(Model)
 export(dot)
-export(dual)
 export(value)
 exportClasses(AbstractRamlAlgObject)
 exportClasses(AffineExpr)

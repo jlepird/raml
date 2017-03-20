@@ -28,7 +28,7 @@
 \usage{
 \S4method{[}{ramlArray}(x, i, j, ..., drop = TRUE)
 
-Algebra
+\S4method{+}{ramlVariable,numeric}(e1, e2)
 
 \S4method{+}{numeric,ramlVariable}(e1, e2)
 
@@ -88,5 +88,5 @@ Algebra
 \description{
 Natural subsetting for indicies
 
-Algebra within the raml ecosystem.
+Algebra within the raml ecosystem behaves exactly as you'd expect it to.
 }
