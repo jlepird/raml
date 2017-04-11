@@ -1,0 +1,110 @@
+---
+title: "Creating a Round Robin Meeting Schedule"
+author: "John Lepird"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Creating a Round Robin Meeting Schedule}
+  %\VignetteEngine{knitr::rmarkdown}
+  \VignetteEncoding{UTF-8}
+---
+
+This vignette demonstrates how to use the `raml` package to solve a simple scheduling problem: twelve representatives attend a conference, and each representative needs to meet every other representative one on one. How can we most efficiently schedule this conference?
+
+To begin, we define the model object:
+
+```{r}
+library(raml)
+
+m <- Model()
+m$sense <- "min"
+```
+
+Now, we define our decision variables: should representative `i` meet with representative `j` during time period `j`?
+
+```{r}
+m$var(x[1:12, 1:12, 1:20] >= 0, "Binary")
+```
+
+We know that if `i` is meeting with `j`, then `j` must also be meeting with `i`:
+
+```{r}
+for (k in 1:20) { 
+  for (i in 1:12) {
+    for (j in 1:i) {
+      m$constraint(x[i, j, k] == x[j, i, k])
+    }
+  }
+}
+```
+
+Furthermore, each representative can only meet with one other representative during a given time frame:
+
+```{r}
+for (k in 1:20) {
+  for (i in 1:12) {
+    ex <- 0.0
+    for (j in 1:12) { 
+      ex <- ex + x[i,j,k]
+    }
+    m$constraint(ex <= 1)
+  }
+}
+```
+
+Now, we require every representative meet with every other representative: 
+
+```{r}
+for (i in 1:12) {
+  for (j in 1:12) {
+    if (i != j) {
+      ex <- 0.0
+      for (k in 1:20) { 
+        ex <- ex + x[i,j,k]
+      }
+      m$constraint(ex >= 1)
+    }
+  }
+}
+```
+
+We define our objective function to minimize the amount of time everyone has to spend at the conference:
+
+```{r}
+gamma <- 1.1
+ex <- 0.0
+for (k in 1:20) {
+  for (i in 1:12) { 
+    for (j in 1:12) {
+      ex <- ex + x[i,j,k] * gamma^k
+    }
+  }
+}
+m$objective(ex)
+```
+
+Finally, we can solve the model:
+
+```{r}
+m$solve()
+```
+
+Now, we can visualize the meetings:
+
+```{r, fig.show='hold', fig.cap = "Conference Schedule.", fig.height=5, fig.width=5}
+df <- data.frame(i = numeric(), j = numeric(), k = numeric())
+for (i in 1:12) {
+  for (j in 1:12) {
+    for (k in 1:20) {
+      if (x[i,j,k]@value > 0) {
+        df <- rbind(df, data.frame(i = i, j = j, k = k))
+      }
+    }
+  }
+}
+library(ggplot2)
+ggplot(df, aes(i,j, label = k)) + 
+  geom_text() + 
+  scale_x_continuous("Rep i", breaks = 1:12) + 
+  scale_y_continuous("Rep j", breaks = 1:12)
+```
