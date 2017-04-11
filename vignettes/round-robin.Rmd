@@ -96,7 +96,7 @@ df <- data.frame(i = numeric(), j = numeric(), k = numeric())
 for (i in 1:12) {
   for (j in 1:12) {
     for (k in 1:20) {
-      if (x[i,j,k]@value > 0) {
+      if (value(x[i,j,k]) > 0) {
         df <- rbind(df, data.frame(i = i, j = j, k = k))
       }
     }

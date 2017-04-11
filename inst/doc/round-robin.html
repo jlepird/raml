@@ -129,13 +129,13 @@ m$<span class="kw">objective</span>(ex)</code></pre></div>
 <p>Finally, we can solve the model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m$<span class="kw">solve</span>()</code></pre></div>
 <pre><code>## Optimal solution found.
-## The objective value is: 2.446114e+02</code></pre>
+## The objective value is: 244.61140520652</code></pre>
 <p>Now, we can visualize the meetings:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">i =</span> <span class="kw">numeric</span>(), <span class="dt">j =</span> <span class="kw">numeric</span>(), <span class="dt">k =</span> <span class="kw">numeric</span>())
 for (i in <span class="dv">1</span>:<span class="dv">12</span>) {
   for (j in <span class="dv">1</span>:<span class="dv">12</span>) {
     for (k in <span class="dv">1</span>:<span class="dv">20</span>) {
-      if (x[i,j,k]@value &gt;<span class="st"> </span><span class="dv">0</span>) {
+      if (<span class="kw">value</span>(x[i,j,k]) &gt;<span class="st"> </span><span class="dv">0</span>) {
         df &lt;-<span class="st"> </span><span class="kw">rbind</span>(df, <span class="kw">data.frame</span>(<span class="dt">i =</span> i, <span class="dt">j =</span> j, <span class="dt">k =</span> k))
       }
     }
