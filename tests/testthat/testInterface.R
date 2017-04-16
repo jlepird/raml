@@ -161,3 +161,10 @@ expect_equal(capture.output(m), c("Maximize: 1*x + 1*y", "Subject to:", "\t1*x +
 expect_equal(dot(rep(1, 10), a), dot(a, rep(1, 10)))
 m$var(ary[1:3] >= 0)
 expect_equal(dot(c(1,2,3), ary), 1 * ary[1] + 2 * ary[2] + 3 * ary[3])
+
+expect_equal(rsum(a[i], i = 1:2), a[1] + a[2])
+expect_equal(rsum(b[i,j], i = 1:2, j = 1:2), b[1,1] + b[2,1] + b[1,2] + b[2,2])
+expect_false(exists("i"))
+i <- 1
+expect_error(rsum(a[i], i = 1:2))
+rm(i)

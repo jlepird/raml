@@ -2,6 +2,7 @@
 
 export(Model)
 export(dot)
+export(rsum)
 export(value)
 exportClasses(AbstractRamlAlgObject)
 exportClasses(AffineExpr)

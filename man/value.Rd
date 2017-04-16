@@ -16,3 +16,12 @@ value(x)
 \description{
 A helper function that extracts the value of a variable.
 }
+\examples{
+m <- Model()
+m$var(x >= 0)
+m$objective(x)
+m$constraint(x >= 0.1)
+value(x) # NA
+m$solve()
+value(x) # 0.1
+}

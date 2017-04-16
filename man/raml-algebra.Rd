@@ -90,3 +90,13 @@ Natural subsetting for indicies
 
 Algebra within the raml ecosystem behaves exactly as you'd expect it to.
 }
+\examples{
+m <- Model()
+m$var(x)
+m$var(y)
+#' x + x == 2 * x
+x - x == 0 * x
+x + y + x == x + x + y
+m$objective(x + y)
+m$constraint(x + 2 * y <= 3)
+}

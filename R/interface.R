@@ -310,8 +310,8 @@ setMethod("show", "AffineExpr", function(object) .showAffineExpr(object, new.lin
 #' @rdname raml-algebra
 #' @param e1 The first algebraic object.
 #' @param e2 The second algebraic object.
-#' @example
-#' #' m <- Model()
+#' @examples
+#' m <- Model()
 #' m$var(x)
 #' m$var(y)
 #' #' x + x == 2 * x
@@ -601,7 +601,7 @@ setMethod("dot", signature(b = "numeric", a = "ramlArray"), function(a, b) {
 #' @param x The object.
 #' @export
 #' @rdname value
-#' @example
+#' @examples
 #' m <- Model()
 #' m$var(x >= 0)
 #' m$objective(x)
@@ -640,3 +640,58 @@ setMethod("dual", signature("RAMLModel", "ramlComparison"), function(m, constr) 
   length(constrID) == 1 && return(m$soln$message$auxiliary$dual[constrID])
   stop(paste0("Constraint ", capture.output(constr), " not found in model."))
 })
+
+#' Helper function to take sums over variable arrays.
+#' @param var The indexed variable to be summed.
+#' @param ... The indicies to iterate through.
+#' @export
+#' @examples
+#' m <- Model()
+#' m$var(x[1:3] >= 0)
+#' rsum(x[i], i = 1:3)
+#' m$var(y[1:2, 1:2] >= 0)
+#' rsum(y[i,j], i = 1:2, j = 1:2)
+rsum <- function(var, ...) {
+
+  # Get what the user called.
+  args <- match.call(expand.dots = F)
+
+  # Need to iterate over the ... variable to figure out what indicies the user needed.
+  indicies <- list()
+  for (.name in names(args$...)) {
+    indicies[[.name]] <- eval.parent(args$...[[.name]])
+    if (eval.parent(parse(text = paste0("exists(\"", .name, "\")")))) {
+      stop("Index ", .name, " already exists. Use a different index, or remove that variable by calling rm(", .name, ").")
+    }
+  }
+
+  # Take the full cartesian product of the indicies.
+  all.indices <- expand.grid(indicies)
+
+  # The thing we'll ultimately return.
+  out <- 0.0
+
+  # calling this here prevents R's lazy evaluate from ever calling the arguments.
+  args.s <- as.character(args)
+
+  # For each value of the cartesian product
+  for (i in 1:nrow(all.indices)) {
+
+    # Get the raw index, i.e. x[i]
+    varCall <- args.s[2]
+    for (var in colnames(all.indices)) {
+      # Sub in the variable with the value of that variable.
+      eval.parent(parse(text = paste0(var, "<-", all.indices[i, var])))
+    }
+
+    # Eval the new arg in the parent env and add it to our return call.
+    out <- out + eval.parent(parse(text = varCall))
+  }
+
+  # Delete the user-scope vars we created.
+  eval.parent(parse(text = paste0("rm(", paste0(colnames(all.indices), collapse = ","), ")")))
+
+  return(out)
+}
+
+
