@@ -20,7 +20,7 @@ m <- Model()
 m$sense <- "min"
 ```
 
-Now, we define our decision variables: should representative `i` meet with representative `j` during time period `j`?
+Now, we define our decision variables: should representative `i` meet with representative `j` during time period `k`?
 
 ```{r}
 m$var(x[1:12, 1:12, 1:20] >= 0, "Binary")
@@ -43,11 +43,7 @@ Furthermore, each representative can only meet with one other representative dur
 ```{r}
 for (k in 1:20) {
   for (i in 1:12) {
-    ex <- 0.0
-    for (j in 1:12) { 
-      ex <- ex + x[i,j,k]
-    }
-    m$constraint(ex <= 1)
+    m$constraint(rsum(x[i,j_i,k], j_i = 1:12) <= 1)
   }
 }
 ```
@@ -58,11 +54,7 @@ Now, we require every representative meet with every other representative:
 for (i in 1:12) {
   for (j in 1:12) {
     if (i != j) {
-      ex <- 0.0
-      for (k in 1:20) { 
-        ex <- ex + x[i,j,k]
-      }
-      m$constraint(ex >= 1)
+      m$constraint(rsum(x[i,j,k_i], k_i = 1:20) >= 1)
     }
   }
 }
@@ -72,15 +64,7 @@ We define our objective function to minimize the amount of time everyone has to 
 
 ```{r}
 gamma <- 1.1
-ex <- 0.0
-for (k in 1:20) {
-  for (i in 1:12) { 
-    for (j in 1:12) {
-      ex <- ex + x[i,j,k] * gamma^k
-    }
-  }
-}
-m$objective(ex)
+m$objective(rsum(gamma^k_i * x[i_i, j_i, k_i], i_i = 1:12, j_i = 1:12, k_i = 1:20))
 ```
 
 Finally, we can solve the model:

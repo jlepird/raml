@@ -24,6 +24,9 @@
 \alias{>=,AbstractRamlAlgObject,ANY-method}
 \alias{<=,AbstractRamlAlgObject,ANY-method}
 \alias{==,AbstractRamlAlgObject,ANY-method}
+\alias{==,AbstractRamlAlgObject,AbstractRamlAlgObject-method}
+\alias{<=,AbstractRamlAlgObject,AbstractRamlAlgObject-method}
+\alias{>=,AbstractRamlAlgObject,AbstractRamlAlgObject-method}
 \title{Natural subsetting for indicies}
 \usage{
 \S4method{[}{ramlArray}(x, i, j, ..., drop = TRUE)
@@ -69,6 +72,12 @@
 \S4method{<=}{AbstractRamlAlgObject,ANY}(e1, e2)
 
 \S4method{==}{AbstractRamlAlgObject,ANY}(e1, e2)
+
+\S4method{==}{AbstractRamlAlgObject,AbstractRamlAlgObject}(e1, e2)
+
+\S4method{<=}{AbstractRamlAlgObject,AbstractRamlAlgObject}(e1, e2)
+
+\S4method{>=}{AbstractRamlAlgObject,AbstractRamlAlgObject}(e1, e2)
 }
 \arguments{
 \item{x}{The object of \code{"ramlArray"} to be subsetted.}
@@ -89,6 +98,12 @@
 Natural subsetting for indicies
 
 Algebra within the raml ecosystem behaves exactly as you'd expect it to.
+
+Totally redundent, but supresses warnings when two variables are compared.
+
+Totally redundent, but supresses warnings when two variables are compared.
+
+Totally redundent, but supresses warnings when two variables are compared.
 }
 \examples{
 m <- Model()

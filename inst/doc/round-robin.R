@@ -19,11 +19,7 @@ for (k in 1:20) {
 ## ------------------------------------------------------------------------
 for (k in 1:20) {
   for (i in 1:12) {
-    ex <- 0.0
-    for (j in 1:12) { 
-      ex <- ex + x[i,j,k]
-    }
-    m$constraint(ex <= 1)
+    m$constraint(rsum(x[i,j_i,k], j_i = 1:12) <= 1)
   }
 }
 
@@ -31,26 +27,14 @@ for (k in 1:20) {
 for (i in 1:12) {
   for (j in 1:12) {
     if (i != j) {
-      ex <- 0.0
-      for (k in 1:20) { 
-        ex <- ex + x[i,j,k]
-      }
-      m$constraint(ex >= 1)
+      m$constraint(rsum(x[i,j,k_i], k_i = 1:20) >= 1)
     }
   }
 }
 
 ## ------------------------------------------------------------------------
 gamma <- 1.1
-ex <- 0.0
-for (k in 1:20) {
-  for (i in 1:12) { 
-    for (j in 1:12) {
-      ex <- ex + x[i,j,k] * gamma^k
-    }
-  }
-}
-m$objective(ex)
+m$objective(rsum(gamma^k_i * x[i_i, j_i, k_i], i_i = 1:12, j_i = 1:12, k_i = 1:20))
 
 ## ------------------------------------------------------------------------
 m$solve()

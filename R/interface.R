@@ -542,6 +542,40 @@ setMethod("==", signature(e2 = "ANY", e1 = "AbstractRamlAlgObject"), function(e1
              comp = "=="))
 })
 
+#' Totally redundent, but suppresses warnings when two variables are compared.
+#' @export
+#' @rdname raml-algebra
+setMethod("==", signature(e2 = "AbstractRamlAlgObject", e1 = "AbstractRamlAlgObject"), function(e1, e2){
+  return(new("ramlComparison",
+             lhs = .toAffineExpr(e1),
+             rhs = .toAffineExpr(e2),
+             comp = "=="))
+})
+
+
+#' Totally redundent, but suppresses warnings when two variables are compared.
+#' @export
+#' @rdname raml-algebra
+setMethod("<=", signature(e2 = "AbstractRamlAlgObject", e1 = "AbstractRamlAlgObject"), function(e1, e2){
+  return(new("ramlComparison",
+             lhs = .toAffineExpr(e1),
+             rhs = .toAffineExpr(e2),
+             comp = "<="))
+})
+
+
+#' Totally redundent, but suppresses warnings when two variables are compared.
+#' @export
+#' @rdname raml-algebra
+setMethod(">=", signature(e2 = "AbstractRamlAlgObject", e1 = "AbstractRamlAlgObject"), function(e1, e2){
+  return(new("ramlComparison",
+             lhs = .toAffineExpr(e1),
+             rhs = .toAffineExpr(e2),
+             comp = ">="))
+})
+
+
+
 #' Takes the inner product of a variable array and a numeric array.
 #' @export
 #' @param a An array of class \code{"numeric"}.
