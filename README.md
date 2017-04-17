@@ -49,3 +49,6 @@ value(y) # 5
 
 dual(m, x + y <= 5) # 2.0, the shadow cost of the constraint x + y <= 5.
 ```
+## More Examples
+
+* [Creating a round-robin meeting schedule](https://jlepird.github.io/raml/inst/doc/round-robin.html)
