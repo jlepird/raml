@@ -2,7 +2,7 @@ Package: raml
 Type: Package
 Title: Algebric Modeling Language for R
 Version: 0.1.0
-Author: John Lepird 
+Authors@R: c(person("John", "Lepird", role = c("aut", "cre"), email = "jlepird@alum.mit.edu")) 
 Maintainer: John Lepird <jlepird@alum.mit.edu>
 Description: Implements an algabraic modeling language in R. Building large 
     linear and mixed-integer programs by manually constructing matrices is 

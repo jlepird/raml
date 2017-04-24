@@ -23,7 +23,7 @@ m$sense <- "min"
 Now, we define our decision variables: should representative `i` meet with representative `j` during time period `k`?
 
 ```{r}
-m$var(x[1:12, 1:12, 1:20] >= 0, "Binary")
+m$var(x[1:12, 1:12, 1:20], "Binary")
 ```
 
 We know that if `i` is meeting with `j`, then `j` must also be meeting with `i`:
@@ -90,5 +90,7 @@ library(ggplot2)
 ggplot(df, aes(i,j, label = k)) + 
   geom_text() + 
   scale_x_continuous("Rep i", breaks = 1:12) + 
-  scale_y_continuous("Rep j", breaks = 1:12)
+  scale_y_continuous("Rep j", breaks = 1:12) + 
+  ggtitle("When should Rep i meet with Rep j?") + 
+  theme_minimal()
 ```
