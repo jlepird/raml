@@ -99,11 +99,11 @@ Natural subsetting for indicies
 
 Algebra within the raml ecosystem behaves exactly as you'd expect it to.
 
-Totally redundent, but supresses warnings when two variables are compared.
+Totally redundent, but suppresses warnings when two variables are compared.
 
-Totally redundent, but supresses warnings when two variables are compared.
+Totally redundent, but suppresses warnings when two variables are compared.
 
-Totally redundent, but supresses warnings when two variables are compared.
+Totally redundent, but suppresses warnings when two variables are compared.
 }
 \examples{
 m <- Model()
