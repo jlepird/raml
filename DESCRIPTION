@@ -1,14 +1,14 @@
 Package: raml
 Type: Package
-Title: Algebric Modeling Language for R
-Version: 0.1.0
+Title: Algebraic Modeling Language for Linear and Integer Programs
+Version: 0.1.1
 Authors@R: c(person("John", "Lepird", role = c("aut", "cre"), email = "jlepird@alum.mit.edu")) 
 Maintainer: John Lepird <jlepird@alum.mit.edu>
-Description: Implements an algabraic modeling language in R. Building large 
+Description: Implements an algebraic modeling language. Building large 
     linear and mixed-integer programs by manually constructing matrices is 
-    tedius, error-prone, and difficult for others to understand. This package
+    tedious, error-prone, and difficult for others to understand. This package
     alleviates this issue by allowing users to define their optimization problems
-    in terms of variables and algabraic expressions, as one would do on a blackboard.
+    in terms of variables and algebraic expressions, as one would do on a blackboard.
     Once the problem is defined, matrices are automatically constructed and passed
     to the user's available solver.
 License: MIT + file LICENSE

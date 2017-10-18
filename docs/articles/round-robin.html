@@ -29,10 +29,25 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="..//index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
 </li>
 <li>
-  <a href="../articles/index.html">Articles</a>
+  <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="../articles/round-robin.html">Creating a Round Robin Meeting Schedule</a>
+    </li>
+  </ul>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
@@ -50,7 +65,7 @@
       <h1>Creating a Round Robin Meeting Schedule</h1>
                         <h4 class="author">John Lepird</h4>
             
-            <h4 class="date">2017-04-23</h4>
+            <h4 class="date">2017-10-18</h4>
           </div>
 
     
@@ -60,7 +75,7 @@
 <p>To begin, we define the model object:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(raml)</code></pre></div>
 <pre><code>## Loading required package: ROI</code></pre>
-<pre><code>## ROI: R Optimization Infrastructure</code></pre>
+<pre><code>## ROI.plugin.glpk: R Optimization Infrastructure</code></pre>
 <pre><code>## Registered solver plugins: nlminb, glpk.</code></pre>
 <pre><code>## Default solver: auto.</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw"><a href="../reference/Model.html">Model</a></span>()
@@ -108,12 +123,12 @@ for (i in <span class="dv">1</span>:<span class="dv">12</span>) {
   }
 }
 <span class="kw">library</span>(ggplot2)
-<span class="kw">ggplot</span>(df, <span class="kw">aes</span>(i,j, <span class="dt">label =</span> k)) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_text</span>() +<span class="st"> </span>
-<span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="st">"Rep i"</span>, <span class="dt">breaks =</span> <span class="dv">1</span>:<span class="dv">12</span>) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="st">"Rep j"</span>, <span class="dt">breaks =</span> <span class="dv">1</span>:<span class="dv">12</span>) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"When should Rep i meet with Rep j?"</span>) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">theme_minimal</span>()</code></pre></div>
+<span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(df, <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(i,j, <span class="dt">label =</span> k)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_text">geom_text</a></span>() +<span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_x_continuous</a></span>(<span class="st">"Rep i"</span>, <span class="dt">breaks =</span> <span class="dv">1</span>:<span class="dv">12</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_y_continuous</a></span>(<span class="st">"Rep j"</span>, <span class="dt">breaks =</span> <span class="dv">1</span>:<span class="dv">12</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">ggtitle</a></span>(<span class="st">"When should Rep i meet with Rep j?"</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_minimal</a></span>()</code></pre></div>
 <div class="figure">
 <img src="round-robin_files/figure-html/unnamed-chunk-8-1.png" alt="Conference Schedule." width="480"><p class="caption">
 Conference Schedule.

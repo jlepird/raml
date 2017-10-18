@@ -3,7 +3,7 @@ library(ROI)
 #' @importFrom ROI L_constraint
 #' @importFrom ROI V_bound
 #' @importFrom ROI ROI_solve
-.solve <- function(varsIn, constraints, obj, sense) {
+.solve <- function(varsIn, constraints, obj, sense, ...) {
   varData <- .expand.vars(varsIn)
   vars <- varData$names
   m <- length(constraints)
@@ -55,7 +55,7 @@ library(ROI)
             bounds = bounds,
             types = varData$type
             )
- soln <- ROI_solve(prob)
+ soln <- ROI_solve(prob, ...)
 
  if (soln$status$code == 0) {
    .populateGlobal(vars, soln)

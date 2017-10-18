@@ -109,7 +109,7 @@ Totally redundent, but suppresses warnings when two variables are compared.
 m <- Model()
 m$var(x)
 m$var(y)
-#' x + x == 2 * x
+x + x == 2 * x
 x - x == 0 * x
 x + y + x == x + x + y
 m$objective(x + y)

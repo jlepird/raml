@@ -2,13 +2,21 @@
 % Please edit documentation in R/interface.R
 \name{Model}
 \alias{Model}
-\title{Factory for creating Models.}
+\title{Create an optimization model.}
 \usage{
-Model(...)
-}
-\arguments{
-\item{...}{Arguments to be passed to the}
+Model()
 }
 \description{
-Factory for creating Models.
+Creates a object that will hold your optimization model.
+ You can use the methods of this object to define your optimization problem.
+}
+\examples{
+m <- Model()
+m$var(x >= 0)
+m$var(y >= 0)
+m$constraint(x + y <= 2)
+m$sense <- "max"
+m$objective(2*x + y)
+m$solve()
+value(x)
 }

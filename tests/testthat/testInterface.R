@@ -7,7 +7,12 @@ expect_equal(x@bounds[1], 0)
 expect_equal(x@bounds[2], Inf)
 expect_equal(x@name, "x")
 expect_equal(x@integer, "Real")
-expect_equal(capture.output(x), "x ∈ ℝ ∩ [0, Inf)")
+if(.Platform$OS.type == "unix") {
+  expect_equal(capture.output(x), "x ∈ ℝ ∩ [0, Inf)")
+} else {
+  print("Skipping Unicode test on Windows...")
+}
+
 
 expect_error(m$var(x[[]]))
 
@@ -17,7 +22,11 @@ expect_equal(y@bounds[1],-Inf)
 expect_equal(y@bounds[2], 10)
 expect_equal(y@name, "y")
 expect_equal(y@integer, "Real")
-expect_equal(capture.output(y), "y ∈ ℝ ∩ (-Inf, 10]")
+if(.Platform$OS.type == "unix") {
+  expect_equal(capture.output(y), "y ∈ ℝ ∩ (-Inf, 10]")
+} else {
+  print("Skipping Unicode test on Windows...")
+}
 
 m$var(z)
 expect_s4_class(z, "ramlVariable")
@@ -25,7 +34,11 @@ expect_equal(z@bounds[1],-Inf)
 expect_equal(z@bounds[2], Inf)
 expect_equal(z@name, "z")
 expect_equal(z@integer, "Real")
-expect_equal(capture.output(z), "z ∈ ℝ")
+if(.Platform$OS.type == "unix") {
+  expect_equal(capture.output(z), "z ∈ ℝ")
+} else {
+  print("Skipping Unicode test on Windows...")
+}
 
 m$var(a[1:10] >= 0)
 expect_s4_class(a, "ramlArray")
@@ -36,9 +49,18 @@ expect_equal(a@bounds[2], Inf)
 expect_equal(a@name, "a")
 expect_equal(a@integer, "Real")
 expect_equal(length(a@indicies), 10)
-expect_equal(capture.output(a), "a[i] ∈ ℝ ∩ [0, Inf) ∀ i ∈ 1:10")
+if(.Platform$OS.type == "unix") {
+  expect_equal(capture.output(a), "a[i] ∈ ℝ ∩ [0, Inf) ∀ i ∈ 1:10")
+} else {
+  print("Skipping Unicode test on Windows...")
+}
+
 expect_equal(a[1], a_1)
+if(.Platform$OS.type == "unix") {
 expect_equal(capture.output(a[1]), "a[1] ∈ ℝ ∩ [0, Inf)")
+} else {
+  print("Skipping Unicode test on Windows...")
+}
 expect_error(a[1,1])
 
 m$var(b[1:10, 1:10] >= 0)
@@ -50,9 +72,17 @@ expect_equal(b@bounds[2], Inf)
 expect_equal(b@name, "b")
 expect_equal(b@integer, "Real")
 expect_equal(length(b@indicies), 100)
+if(.Platform$OS.type == "unix") {
 expect_equal(capture.output(b), "b[i] ∈ ℝ ∩ [0, Inf) ∀ i ∈ 1:10 Ⓧ 1:10")
+} else {
+  print("Skipping Unicode test on Windows...")
+}
 expect_equal(b[1,1], b_1_1)
+if(.Platform$OS.type == "unix") {
 expect_equal(capture.output(b[1,1]), "b[1,1] ∈ ℝ ∩ [0, Inf)")
+} else {
+  print("Skipping Unicode test on Windows...")
+}
 expect_error(b[1])
 
 m$var(d[1:2,1:2,1:2])
@@ -61,11 +91,19 @@ expect_error(d[1,1,1,1,1])
 
 m$var(bin, integer = "Binary")
 expect_equal(bin@integer, "Binary")
+if(.Platform$OS.type == "unix") {
 expect_equal(capture.output(bin), "bin ∈ {0, 1}")
+} else {
+  print("Skipping Unicode test on Windows...")
+}
 
 m$var(int, integer = "Integer")
 expect_equal(int@integer, "Integer")
+if(.Platform$OS.type == "unix") {
 expect_equal(capture.output(int), "int ∈ ℤ")
+} else {
+  print("Skipping Unicode test on Windows...")
+}
 
 x1 <- x + 1
 expect_s4_class(x1, "AffineExpr")

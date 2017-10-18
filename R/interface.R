@@ -13,7 +13,7 @@
                                 ".__constraints",
                                 ".__variables"),
                      methods = list(
-                       initialize = function(...){
+                       initialize = function(){
 
                          # Provide default values
                          sense          <<- "min"
@@ -21,9 +21,6 @@
                          .__constraints <<- list()
                          .__variables   <<- NULL
                          soln           <<- NULL
-
-                         # Call super to override any defaults
-                         callSuper(...)
                        },
                        show = function() {
                          if (sense == "min"){
@@ -90,17 +87,29 @@
                        objective = function(expr){
                          .__obj <<- .toAffineExpr(expr)
                        },
-                       solve = function() {
-                          soln <<- .solve(.__variables, .__constraints, .__obj, sense)
+                       solve = function(...) {
+                         #' @param ... Additional arguments to pass to the ROI_solve method.
+                          soln <<- .solve(.__variables, .__constraints, .__obj, sense, ...)
                           cat(paste0("Optimal solution found.\nThe objective value is: ", soln$objval, "\n"))
                        }
                       )
 )
 
-#' Factory for creating Models.
+#' Create an optimization model.
+#' @description
+#'  Creates a object that will hold your optimization model.
+#'  You can use the methods of this object to define your optimization problem.
 #' @export
-#' @param ... Arguments to be passed to the
-Model <- function(...) .Model(...)
+#' @examples
+#' m <- Model()
+#' m$var(x >= 0)
+#' m$var(y >= 0)
+#' m$constraint(x + y <= 2)
+#' m$sense <- "max"
+#' m$objective(2*x + y)
+#' m$solve()
+#' value(x)
+Model <- function() .Model()
 
 #' An abstract class that represents anything that conforms to algebraic rules.
 #' @exportClass AbstractRamlAlgObject
@@ -304,7 +313,8 @@ setMethod("show", "AffineExpr", function(object) .showAffineExpr(object, new.lin
   else cat(out)
 }
 
-
+#' Algebra in raml
+#' @description
 #' Algebra within the raml ecosystem behaves exactly as you'd expect it to.
 #' @export
 #' @rdname raml-algebra
@@ -314,7 +324,7 @@ setMethod("show", "AffineExpr", function(object) .showAffineExpr(object, new.lin
 #' m <- Model()
 #' m$var(x)
 #' m$var(y)
-#' #' x + x == 2 * x
+#' x + x == 2 * x
 #' x - x == 0 * x
 #' x + y + x == x + x + y
 #' m$objective(x + y)
@@ -576,7 +586,8 @@ setMethod(">=", signature(e2 = "AbstractRamlAlgObject", e1 = "AbstractRamlAlgObj
 
 
 
-#' Takes the inner product of a variable array and a numeric array.
+#' Vector inner products.
+#' @description Takes the inner product of a variable array and a numeric array.
 #' @export
 #' @param a An array of class \code{"numeric"}.
 #' @param b An array of variables.
@@ -585,6 +596,7 @@ setMethod(">=", signature(e2 = "AbstractRamlAlgObject", e1 = "AbstractRamlAlgObj
 #' m <- Model()
 #' m$var(x[1:3] >= 0)
 #' m$constraint(dot(x, c(1,1,1)) >= 1)
+#' m$objective(dot(c(1,2,3), x))
 #' show(m)
 setGeneric("dot", function(a, b) standardGeneric("dot"))
 
@@ -610,7 +622,7 @@ setMethod("dot", signature(a = "numeric", b = "ramlArray"), function(a, b) {
 #' @rdname dots
 setMethod("dot", signature(b = "numeric", a = "ramlArray"), function(a, b) {
   # Due to issues with variables existing in the right scope, we can't just
-  # call dot(b, a), as eval.parent would call *here*, not where
+  # call dot(b, a), as eval.parent would call *here*, not where it should.
   tmp <- a
   a   <- b
   b   <- tmp
@@ -662,7 +674,7 @@ setMethod("value", signature("ramlAlgObject"), function(x) return(x@value))
 #' m$objective(x)
 #' m$constraint(x >= 0.1)
 #' m$solve()
-#' dual(m, x >= 0.1) # 1.0
+#' dual(m, x >= 0.1)  # 1.0
 setGeneric("dual", function(m, constr) standardGeneric("dual"))
 
 #' @exportMethod dual
@@ -682,9 +694,11 @@ setMethod("dual", signature("RAMLModel", "ramlComparison"), function(m, constr) 
 #' @examples
 #' m <- Model()
 #' m$var(x[1:3] >= 0)
-#' rsum(x[i], i = 1:3)
+#' rsum(x[i], i = 1:3)  # x[1] + x[2] + x[3]
 #' m$var(y[1:2, 1:2] >= 0)
-#' rsum(y[i,j], i = 1:2, j = 1:2)
+#' rsum(y[i,j], i = 1:2, j = 1:2)  # y[1,1] + y[1,2] + y[2,1] + y[2,2]
+#' v <- c(1,2,3)
+#' rsum(v[i]*x[i], i = 1:3)  # 1*x[1] + 2*x[2] + 3*x[3]
 rsum <- function(var, ...) {
 
   # Get what the user called.

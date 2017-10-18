@@ -17,7 +17,9 @@ Helper function to take sums over variable arrays.
 \examples{
 m <- Model()
 m$var(x[1:3] >= 0)
-rsum(x[i], i = 1:3)
+rsum(x[i], i = 1:3)  # x[1] + x[2] + x[3]
 m$var(y[1:2, 1:2] >= 0)
-rsum(y[i,j], i = 1:2, j = 1:2)
+rsum(y[i,j], i = 1:2, j = 1:2)  # y[1,1] + y[1,2] + y[2,1] + y[2,2]
+v <- c(1,2,3)
+rsum(v[i]*x[i], i = 1:3)  # 1*x[1] + 2*x[2] + 3*x[3]
 }

@@ -27,5 +27,5 @@ m$var(x >= 0)
 m$objective(x)
 m$constraint(x >= 0.1)
 m$solve()
-dual(m, x >= 0.1) # 1.0
+dual(m, x >= 0.1)  # 1.0
 }

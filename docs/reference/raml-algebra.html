@@ -23,7 +23,8 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-
+  
+  
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -51,10 +52,25 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="..//index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
 </li>
 <li>
-  <a href="../articles/index.html">Articles</a>
+  <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/round-robin.html">Creating a Round Robin Meeting Schedule</a>
+    </li>
+  </ul>
 </li>
       </ul>
       
@@ -195,8 +211,7 @@
     <pre class="examples"><div class='input'><span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='Model.html'>Model</a></span>()
 <span class='no'>m</span>$<span class='fu'>var</span>(<span class='no'>x</span>)
 <span class='no'>m</span>$<span class='fu'>var</span>(<span class='no'>y</span>)
-<span class='co'>#' x + x == 2 * x</span>
-<span class='no'>x</span> - <span class='no'>x</span> <span class='kw'>==</span> <span class='fl'>0</span> * <span class='no'>x</span></div><div class='output co'>#&gt; <span class='error'>Error in e2 * e1: invalid object (non-function) used as method</span></div><div class='input'><span class='no'>x</span> + <span class='no'>y</span> + <span class='no'>x</span> <span class='kw'>==</span> <span class='no'>x</span> + <span class='no'>x</span> + <span class='no'>y</span></div><div class='output co'>#&gt; 2*x + 1*y == 2*x + 1*y</div><div class='input'><span class='no'>m</span>$<span class='fu'>objective</span>(<span class='no'>x</span> + <span class='no'>y</span>)
+<span class='no'>x</span> + <span class='no'>x</span> <span class='kw'>==</span> <span class='fl'>2</span> * <span class='no'>x</span></div><div class='output co'>#&gt; <span class='error'>Error in e2 * e1: invalid object (non-function) used as method</span></div><div class='input'><span class='no'>x</span> - <span class='no'>x</span> <span class='kw'>==</span> <span class='fl'>0</span> * <span class='no'>x</span></div><div class='output co'>#&gt; <span class='message'>Found more than one class "ramlVariable" in cache; using the first, from namespace 'raml'</span></div><div class='output co'>#&gt; <span class='message'>Also defined by ‘.GlobalEnv’</span></div><div class='output co'>#&gt; <span class='message'>Found more than one class "ramlVariable" in cache; using the first, from namespace 'raml'</span></div><div class='output co'>#&gt; <span class='message'>Also defined by ‘.GlobalEnv’</span></div><div class='output co'>#&gt; <span class='error'>Error in e2 * e1: invalid object (non-function) used as method</span></div><div class='input'><span class='no'>x</span> + <span class='no'>y</span> + <span class='no'>x</span> <span class='kw'>==</span> <span class='no'>x</span> + <span class='no'>x</span> + <span class='no'>y</span></div><div class='output co'>#&gt; 2*x + 1*y == 2*x + 1*y</div><div class='input'><span class='no'>m</span>$<span class='fu'>objective</span>(<span class='no'>x</span> + <span class='no'>y</span>)
 <span class='no'>m</span>$<span class='fu'>constraint</span>(<span class='no'>x</span> + <span class='fl'>2</span> * <span class='no'>y</span> <span class='kw'>&lt;=</span> <span class='fl'>3</span>)</div><div class='output co'>#&gt; <span class='error'>Error in e2 * e1: invalid object (non-function) used as method</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

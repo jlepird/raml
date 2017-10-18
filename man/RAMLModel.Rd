@@ -5,6 +5,9 @@
 \alias{RAMLModel}
 \alias{.Model}
 \title{A class that holds all the necessary data to build a linear programming model.}
+\arguments{
+\item{...}{Additional arguments to pass to the ROI_solve method.}
+}
 \description{
 A class that holds all the necessary data to build a linear programming model.
 }

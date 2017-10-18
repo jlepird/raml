@@ -5,7 +5,7 @@
 \alias{dot}
 \alias{dot,numeric,ramlArray-method}
 \alias{dot,ramlArray,numeric-method}
-\title{Takes the inner product of a variable array and a numeric array.}
+\title{Vector inner products.}
 \usage{
 dot(a, b)
 
@@ -25,5 +25,6 @@ Takes the inner product of a variable array and a numeric array.
 m <- Model()
 m$var(x[1:3] >= 0)
 m$constraint(dot(x, c(1,1,1)) >= 1)
+m$objective(dot(c(1,2,3), x))
 show(m)
 }
