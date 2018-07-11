@@ -206,3 +206,15 @@ expect_false(exists("i"))
 i <- 1
 expect_error(rsum(a[i], i = 1:2))
 rm(i)
+
+# Validate array calls occur in the correct namespace.
+ary <- c(1,2)
+f <- function() {
+  ary <- c(3,4)
+  expect_equal(rsum(a[i]*ary[i], i = 1:2), 3*a[1] + 4*a[2])
+}
+f()
+
+# Validate sum works in general case of dimension (1-2 hard-coded for speed)
+m$var(X[1:1, 1:1, 1:1, 1:1] >= 0)
+expect_equal(rsum(X[i, j, k, l], i = 1:1, j = 1:1, k = 1:1, l = 1:1), 1*X[1,1,1,1])

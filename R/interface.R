@@ -204,7 +204,7 @@ setMethod("[", signature(x = "ramlArray"), function(x, i, j, ..., drop = TRUE) {
       return(eval.parent(parse(text = paste0(x@name, "_", i, "_", j))))
     } else {
       if (dimen != 2 + length(list(...))) stop(paste0("Wrong number of indicies-- expected ", dimen, ", got ", 2 + length(list(...)), "."))
-      return(eval.parent(parse(text = paste0(x@name, "_", i, "_", j, "_", paste(..., collapse = "_")))))
+      return(eval.parent(parse(text = paste0(x@name, "_", i, "_", j, "_", paste(..., sep = "_")))))
     }
 })
 
